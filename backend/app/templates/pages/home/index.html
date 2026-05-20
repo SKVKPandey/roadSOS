@@ -1,0 +1,341 @@
+{% extends 'layouts/base.html' %}
+{% from 'components/button.html' import render_button, render_sos_button %}
+
+{% block title %}roadSOS Dashboard | Premium Roadside Assistance{% endblock %}
+
+{% block content %}
+<div class="container mt-8 flex flex-col gap-12">
+  <!-- ==========================================================================
+       1. Hero Emergency Action Segment
+       ========================================================================== -->
+  <section class="grid grid-2 gap-8 items-center p-8 glass-card" style="border-radius: var(--radius-lg)">
+    <div class="flex flex-col gap-4">
+      <div class="flex items-center gap-2">
+        <span class="pulse-indicator glow-danger"></span>
+        <span class="text-xs uppercase tracking-widest text-danger font-bold">Priority Sat-Link Active</span>
+      </div>
+      <h1 class="text-gradient text-5xl">Stranded? Get Rescued Instantly.</h1>
+      <p class="text-lg">
+        One tap initiates high-priority dispatch with automatic GPS location logging. roadSOS sends elite local towing, tire, battery, and lockout experts directly to your location.
+      </p>
+      <div class="flex items-center gap-4 mt-2">
+        <div class="flex items-center gap-2 text-sm font-semibold">
+          <i class="fa-solid fa-satellite-dish text-info"></i>
+          <span>GPS Geolocation Logged</span>
+        </div>
+        <div class="flex items-center gap-2 text-sm font-semibold">
+          <i class="fa-solid fa-shield-halved text-success"></i>
+          <span>99.8% ETA Accuracy</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Reusable SOS Pulse Core -->
+    <div class="flex flex-col items-center justify-center p-6 relative">
+      <!-- Glow Ring backdrop styling -->
+      <div class="sos-ring-glow"></div>
+      {{ render_sos_button('SOS', 'Initiate Rescue', 'hero-sos-trigger') }}
+      <span class="text-xs text-muted mt-4 text-center font-medium">
+        <i class="fa-solid fa-circle-info mr-1 text-warning"></i> Tap to simulate real-time rescuer dispatch
+      </span>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       2. Quick Service Request Grid
+       ========================================================================== -->
+  <section class="flex flex-col gap-6">
+    <div class="flex flex-col">
+      <span class="text-xs uppercase tracking-widest text-gradient-red font-bold mb-1">Interactive Telemetry</span>
+      <h2 class="text-3xl text-gradient">Select Breakdown Service</h2>
+      <p class="text-sm">Tap any service below to request immediate vehicle recovery assistance.</p>
+    </div>
+
+    <div class="grid grid-4 gap-6">
+      <!-- Towing Card -->
+      <div class="glass-card p-6 flex flex-col justify-between gap-4 interactive-service-card" onclick="simulateServiceTrigger('Towing & Recovery')">
+        <div class="flex justify-between items-start">
+          <div class="service-icon-box text-danger bg-red-dim flex items-center justify-center">
+            <i class="fa-solid fa-truck-pickup"></i>
+          </div>
+          <span class="text-xs font-semibold text-danger">High Priority</span>
+        </div>
+        <div class="flex flex-col gap-1">
+          <h3 class="text-lg font-semibold text-gradient">Towing & Recovery</h3>
+          <p class="text-xs">Flatbeds, heavy recovery vehicles, and multi-car haulers.</p>
+        </div>
+        <div class="flex justify-between items-center mt-2 border-t pt-3" style="border-color: var(--surface-border)">
+          <span class="text-xs text-muted">Avg ETA: <strong>18 mins</strong></span>
+          <span class="text-xs text-info font-bold"><i class="fa-solid fa-circle-chevron-right"></i></span>
+        </div>
+      </div>
+
+      <!-- Battery Jumpstart Card -->
+      <div class="glass-card p-6 flex flex-col justify-between gap-4 interactive-service-card" onclick="simulateServiceTrigger('Battery Jumpstart')">
+        <div class="flex justify-between items-start">
+          <div class="service-icon-box text-warning bg-amber-dim flex items-center justify-center">
+            <i class="fa-solid fa-car-battery"></i>
+          </div>
+          <span class="text-xs font-semibold text-warning">Immediate</span>
+        </div>
+        <div class="flex flex-col gap-1">
+          <h3 class="text-lg font-semibold text-gradient">Dead Battery Jump</h3>
+          <p class="text-xs">Boost start, charging level checks, or replacement dispatch.</p>
+        </div>
+        <div class="flex justify-between items-center mt-2 border-t pt-3" style="border-color: var(--surface-border)">
+          <span class="text-xs text-muted">Avg ETA: <strong>12 mins</strong></span>
+          <span class="text-xs text-info font-bold"><i class="fa-solid fa-circle-chevron-right"></i></span>
+        </div>
+      </div>
+
+      <!-- Flat Tire Card -->
+      <div class="glass-card p-6 flex flex-col justify-between gap-4 interactive-service-card" onclick="simulateServiceTrigger('Flat Tire Swap')">
+        <div class="flex justify-between items-start">
+          <div class="service-icon-box text-success bg-green-dim flex items-center justify-center">
+            <i class="fa-solid fa-circle-notch"></i>
+          </div>
+          <span class="text-xs font-semibold text-success">Rapid Dispatch</span>
+        </div>
+        <div class="flex flex-col gap-1">
+          <h3 class="text-lg font-semibold text-gradient">Flat Tire Swap</h3>
+          <p class="text-xs">Spare installations, wheel alignment, or roadside punctures.</p>
+        </div>
+        <div class="flex justify-between items-center mt-2 border-t pt-3" style="border-color: var(--surface-border)">
+          <span class="text-xs text-muted">Avg ETA: <strong>14 mins</strong></span>
+          <span class="text-xs text-info font-bold"><i class="fa-solid fa-circle-chevron-right"></i></span>
+        </div>
+      </div>
+
+      <!-- Lockout Card -->
+      <div class="glass-card p-6 flex flex-col justify-between gap-4 interactive-service-card" onclick="simulateServiceTrigger('Vehicle Lockout')">
+        <div class="flex justify-between items-start">
+          <div class="service-icon-box text-info bg-cyan-dim flex items-center justify-center">
+            <i class="fa-solid fa-key"></i>
+          </div>
+          <span class="text-xs font-semibold text-info">Instant Entry</span>
+        </div>
+        <div class="flex flex-col gap-1">
+          <h3 class="text-lg font-semibold text-gradient">Vehicle Lockout</h3>
+          <p class="text-xs">Professional automotive lockpicks and entry technicians.</p>
+        </div>
+        <div class="flex justify-between items-center mt-2 border-t pt-3" style="border-color: var(--surface-border)">
+          <span class="text-xs text-muted">Avg ETA: <strong>11 mins</strong></span>
+          <span class="text-xs text-info font-bold"><i class="fa-solid fa-circle-chevron-right"></i></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       3. Real-Time Telemetry Tracking Feed
+       ========================================================================== -->
+  <section class="grid grid-3 gap-8">
+    <!-- Telemetry Log Terminal (Left) -->
+    <div class="glass-card p-6 flex flex-col gap-4 col-span-2" style="grid-column: span 2;">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="pulse-indicator glow-cyan"></span>
+          <h3 class="text-lg font-semibold text-gradient">Live Satellite Rescue Feed</h3>
+        </div>
+        <span class="text-xs font-semibold text-muted tracking-wider uppercase">Active Dispatch Center</span>
+      </div>
+
+      <div class="telemetry-terminal font-body text-xs p-4 flex flex-col gap-3 overflow-y-auto" style="height: 220px; background-color: #07090e; border: 1px solid var(--surface-border); border-radius: var(--radius-sm); color: var(--text-muted)">
+        <div class="terminal-row flex gap-4">
+          <span class="text-info font-medium">[18:55:02]</span>
+          <span class="text-success">[CONN] Established secure satellite telemetry route...</span>
+        </div>
+        <div class="terminal-row flex gap-4">
+          <span class="text-info font-medium">[18:55:10]</span>
+          <span>[GPS] Coordinates synced: 28.5383° N, 77.2090° E (Local accuracy index: 98%)</span>
+        </div>
+        <div class="terminal-row flex gap-4">
+          <span class="text-info font-medium">[18:55:25]</span>
+          <span class="text-warning">[WARN] Rescuer dispatch queue monitoring active. Range: 15 miles...</span>
+        </div>
+        <div class="terminal-row flex gap-4" id="terminal-pulse-event">
+          <span class="text-info font-medium">[18:56:01]</span>
+          <span>[STAT] roadSOS network health check: OK. Satellite connection: Excellent.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Rescue Map Panel (Right) -->
+    <div class="glass-card p-6 flex flex-col gap-4 justify-between">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-gradient">Nearby Rescuers</h3>
+        <span class="badge badge-success text-xs font-bold p-1 px-2 text-success" style="border-radius: var(--radius-xs); border: 1px solid var(--success)">14 Available</span>
+      </div>
+      
+      <div class="flex flex-col gap-3">
+        <!-- Fleet Item 1 -->
+        <div class="flex items-center justify-between p-2 glass" style="border-radius: var(--radius-xs)">
+          <div class="flex items-center gap-3">
+            <span class="text-danger text-lg"><i class="fa-solid fa-truck-pickup"></i></span>
+            <div class="flex flex-col">
+              <span class="text-sm font-semibold text-gradient">Rescue Truck #04</span>
+              <span class="text-xs text-muted">Flatbed Recovery</span>
+            </div>
+          </div>
+          <span class="text-xs font-bold text-success">1.2 miles</span>
+        </div>
+
+        <!-- Fleet Item 2 -->
+        <div class="flex items-center justify-between p-2 glass" style="border-radius: var(--radius-xs)">
+          <div class="flex items-center gap-3">
+            <span class="text-warning text-lg"><i class="fa-solid fa-motorcycle"></i></span>
+            <div class="flex flex-col">
+              <span class="text-sm font-semibold text-gradient">Rescue Motor #12</span>
+              <span class="text-xs text-muted">Battery & Lockout Specialist</span>
+            </div>
+          </div>
+          <span class="text-xs font-bold text-success">2.4 miles</span>
+        </div>
+      </div>
+      
+      {{ render_button('View All Local Fleets', 'secondary', '#', size='sm', icon='fa-network-wired', class='w-full') }}
+    </div>
+  </section>
+</div>
+
+<!-- ==========================================================================
+     Dashboard Simulator Modal / Trigger Overlay
+     ========================================================================== -->
+<div class="modal-backdrop glass hidden" id="rescue-modal">
+  <div class="glass-card p-8 text-center max-w-md w-full relative z-10">
+    <div class="modal-indicator text-danger mb-4 flex items-center justify-center animate-bounce" style="font-size: 60px;">
+      <i class="fa-solid fa-satellite-dish"></i>
+    </div>
+    <h2 class="text-2xl font-bold text-gradient mb-2" id="modal-service-title">Dispatching Emergency SOS</h2>
+    <p class="text-sm text-muted mb-6">
+      Satellite geolocation locked. Initiating real-time connection with closest local responder fleet. Please stand by your vehicle safely.
+    </p>
+    <div class="flex flex-col gap-4">
+      <div class="flex items-center justify-between text-xs p-3 glass" style="border-radius: var(--radius-sm)">
+        <span class="font-medium text-muted">GPS Signal Status</span>
+        <span class="text-success font-bold"><i class="fa-solid fa-circle-check"></i> LOCKED</span>
+      </div>
+      <div class="flex items-center justify-between text-xs p-3 glass" style="border-radius: var(--radius-sm)">
+        <span class="font-medium text-muted">Satellite Connection</span>
+        <span class="text-info font-bold"><i class="fa-solid fa-wifi"></i> ACTIVE</span>
+      </div>
+      <div class="flex items-center justify-between text-xs p-3 glass" style="border-radius: var(--radius-sm)">
+        <span class="font-medium text-muted">Estimated Arrival</span>
+        <span class="text-warning font-bold" id="modal-arrival-time"><i class="fa-solid fa-clock"></i> 14 Minutes</span>
+      </div>
+    </div>
+    
+    <button class="btn btn-primary w-full mt-6" onclick="closeRescueModal()">Acknowledge & Monitor Feed</button>
+  </div>
+</div>
+
+<style>
+  /* Hero segment SOS circle alignment wrapper */
+  .sos-ring-glow {
+    position: absolute;
+    width: 260px;
+    height: 260px;
+    border-radius: var(--radius-pill);
+    background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+    z-index: 1;
+    pointer-events: none;
+    animation: float 6s infinite ease-in-out;
+  }
+  
+  /* Service card customized layout items */
+  .interactive-service-card {
+    cursor: pointer;
+    min-height: 210px;
+  }
+  .service-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-lg);
+  }
+  
+  /* Specific Dim Colors for boxes */
+  .bg-red-dim { background-color: rgba(230, 57, 70, 0.1); }
+  .bg-amber-dim { background-color: rgba(255, 183, 3, 0.1); }
+  .bg-green-dim { background-color: rgba(34, 197, 94, 0.1); }
+  .bg-cyan-dim { background-color: rgba(2, 132, 199, 0.1); }
+  
+  /* Telemetry log adjustments */
+  .telemetry-terminal {
+    font-family: monospace;
+    line-height: 1.8;
+  }
+  
+  /* Modal Overlay Backdrop */
+  .modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+  }
+  .modal-backdrop.hidden {
+    display: none !important;
+  }
+</style>
+
+<script>
+  // Simple simulator actions
+  document.addEventListener('DOMContentLoaded', () => {
+    const sosBtn = document.getElementById('hero-sos-trigger');
+    if (sosBtn) {
+      sosBtn.addEventListener('click', () => {
+        triggerRescueSimulation('High-Priority SOS Beacon', '14 Minutes');
+      });
+    }
+  });
+
+  function simulateServiceTrigger(serviceName) {
+    let eta = '15 Minutes';
+    if (serviceName.includes('Battery')) eta = '12 Minutes';
+    if (serviceName.includes('Tire')) eta = '14 Minutes';
+    if (serviceName.includes('Lockout')) eta = '11 Minutes';
+    
+    triggerRescueSimulation(serviceName, eta);
+  }
+
+  function triggerRescueSimulation(serviceName, eta) {
+    const modal = document.getElementById('rescue-modal');
+    const modalTitle = document.getElementById('modal-service-title');
+    const modalEta = document.getElementById('modal-arrival-time');
+    const terminal = document.querySelector('.telemetry-terminal');
+    
+    if (modal && modalTitle && modalEta) {
+      modalTitle.innerHTML = `Dispatching ${serviceName}`;
+      modalEta.innerHTML = `<i class="fa-solid fa-clock"></i> ${eta}`;
+      modal.classList.remove('hidden');
+    }
+    
+    // Append to Terminal Log
+    if (terminal) {
+      const now = new Date();
+      const timeStr = now.toTimeString().split(' ')[0];
+      
+      const newRow = document.createElement('div');
+      newRow.className = 'terminal-row flex gap-4';
+      newRow.innerHTML = `
+        <span class="text-info font-medium">[${timeStr}]</span>
+        <span class="text-danger font-semibold">[SOS] Emergency request triggered: ${serviceName} (Logged ETA: ${eta})</span>
+      `;
+      terminal.appendChild(newRow);
+      
+      // Auto scroll terminal to bottom
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+  }
+
+  function closeRescueModal() {
+    const modal = document.getElementById('rescue-modal');
+    if (modal) {
+      modal.classList.add('hidden');
+    }
+  }
+</script>
+{% endblock %}

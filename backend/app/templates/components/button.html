@@ -1,0 +1,49 @@
+<!-- button.html - Jinja Button Component Macros -->
+
+{#
+  Macro: render_button
+  Renders a highly-customizable button matching the roadSOS visual design language.
+  
+  Parameters:
+    - text (str): The label on the button.
+    - type (str): Style variant ('primary', 'secondary', 'accent', 'success', 'outline'). Defaults to 'primary'.
+    - href (str): If provided, renders an <a> tag instead of a <button> tag.
+    - action_type (str): The 'type' attribute of a standard button ('button', 'submit', 'reset').
+    - size (str): Size scaling ('lg', 'sm', or empty/default).
+    - id (str): Element ID attribute.
+    - class (str): Extra classes to append.
+    - icon (str): FontAwesome class prefix (e.g. 'fa-car', 'fa-location-dot').
+    - loading (bool): Enables spinner status if true.
+#}
+{% macro render_button(text, type='primary', href=None, action_type='submit', size='', id='', class='', icon=None, loading=false) %}
+  {% set btn_classes = ['btn', 'btn-' ~ type, size if size else '', 'btn-loading' if loading else '', class] | join(' ') | trim %}
+  
+  {% if href %}
+    <a href="{{ href }}" class="{{ btn_classes }}" {% if id %}id="{{ id }}"{% endif %}>
+      {% if icon and not loading %}<i class="fa-solid {{ icon }}"></i>{% endif %}
+      <span>{{ text }}</span>
+    </a>
+  {% else %}
+    <button type="{{ action_type }}" class="{{ btn_classes }}" {% if id %}id="{{ id }}"{% endif %} {% if loading %}disabled{% endif %}>
+      {% if icon and not loading %}<i class="fa-solid {{ icon }}"></i>{% endif %}
+      <span>{{ text }}</span>
+    </button>
+  {% endif %}
+{% endmacro %}
+
+{#
+  Macro: render_sos_button
+  Renders the iconic, circular pulsing SOS emergency button.
+  
+  Parameters:
+    - text (str): Core label (e.g. 'SOS'). Defaults to 'SOS'.
+    - subtext (str): Mini secondary label (e.g. 'Press 3s'). Defaults to 'Rescue Me'.
+    - id (str): Element ID attribute.
+    - class (str): Extra classes to append.
+#}
+{% macro render_sos_button(text='SOS', subtext='Rescue Me', id='btn-sos-trigger', class='') %}
+  <button type="button" class="btn-sos {{ class }}" {% if id %}id="{{ id }}"{% endif %}>
+    <span>{{ text }}</span>
+    <span class="btn-sos-subtext">{{ subtext }}</span>
+  </button>
+{% endmacro %}

@@ -1,0 +1,68 @@
+{% extends 'layouts/auth.html' %}
+{% from 'components/button.html' import render_button %}
+
+{% block title %}roadSOS Login | Satellite Control Portal{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-6">
+  <div class="flex flex-col text-center">
+    <h1 class="text-2xl font-bold text-gradient">Portal Login</h1>
+    <p class="text-xs text-muted mt-1">Provide credentials to sync active satellite coverage parameters.</p>
+  </div>
+
+  <form action="{{ url_for('auth.login') }}" method="POST" class="flex flex-col gap-4">
+    <!-- CSRF Protection (Standard Flask WTF handler) -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}">
+
+    <div class="flex flex-col">
+      <label for="username">Username / Rescuer ID</label>
+      <div class="relative">
+        <span class="input-icon text-muted"><i class="fa-solid fa-user-shield"></i></span>
+        <input type="text" id="username" name="username" placeholder="e.g. Rescuer-42" required class="pl-10">
+      </div>
+    </div>
+
+    <div class="flex flex-col">
+      <div class="flex justify-between items-center mb-2">
+        <label for="password" style="margin-bottom: 0;">Access Password</label>
+        <a href="#" class="text-xs text-muted hover:text-white">Forgot Key?</a>
+      </div>
+      <div class="relative">
+        <span class="input-icon text-muted"><i class="fa-solid fa-key"></i></span>
+        <input type="password" id="password" name="password" placeholder="••••••••••••" required class="pl-10">
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between mt-2">
+      <label class="checkbox-container text-xs text-muted flex items-center gap-2" style="margin-bottom: 0;">
+        <input type="checkbox" name="remember" class="w-4 h-4">
+        <span>Persistent Login</span>
+      </label>
+      <span class="text-xs font-semibold text-success"><i class="fa-solid fa-circle-check"></i> Sat-Secure</span>
+    </div>
+
+    {{ render_button('Establish Connection', 'primary', size='lg', icon='fa-network-wired', class='w-full mt-4') }}
+  </form>
+
+  <div class="text-xs text-center text-muted border-t pt-4" style="border-color: var(--surface-border)">
+    New Rescuer Fleet? <a href="{{ url_for('auth.signup') }}" class="font-bold text-gradient-red ml-1">Create Account</a>
+  </div>
+</div>
+
+<style>
+  /* Input prefix icons layout helper */
+  .pl-10 {
+    padding-left: 2.5rem !important;
+  }
+  .input-icon {
+    position: absolute;
+    left: var(--space-4);
+    top: calc(50% - 9px);
+    font-size: var(--text-sm);
+    pointer-events: none;
+  }
+  .checkbox-container input {
+    cursor: pointer;
+  }
+</style>
+{% endblock %}

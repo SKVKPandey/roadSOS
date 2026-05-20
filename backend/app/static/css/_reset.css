@@ -1,0 +1,93 @@
+/* _reset.css - Modern CSS Reset */
+
+/* 1. Box sizing rules */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 2. Prevent font size inflation and set smooth scrolling */
+html {
+  -moz-text-size-adjust: none;
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+/* 3. Remove list styles on ul, ol elements with a list role, which suggests default styling will be removed */
+ul,
+ol {
+  list-style: none;
+}
+
+/* 4. Set core body defaults */
+body {
+  min-height: 100%;
+  text-rendering: optimizeSpeed;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 5. A elements that don't have a class get default styles */
+a:not([class]) {
+  text-decoration-skip-ink: auto;
+}
+
+/* 6. Make images easier to work with */
+img,
+picture {
+  max-width: 100%;
+  display: block;
+}
+
+/* 7. Inherit fonts for inputs and buttons */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+}
+
+/* 8. Make interactive elements cursor pointers */
+button,
+select,
+summary,
+[role="button"] {
+  cursor: pointer;
+}
+
+/* 9. Remove default focus outlines in favor of custom focus-visible styles */
+*:focus {
+  outline: none;
+}
+
+/* 10. Prevent interactive elements from being zoomed in on iOS Safari */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  font-size: 16px;
+}
+
+/* 11. Remove auto-fill yellow background on Chrome */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: var(--text, #ffffff) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* 12. Hide scrollbar but keep functionality if explicitly requested, otherwise standard styling applies */
+[hidden] {
+  display: none !important;
+}

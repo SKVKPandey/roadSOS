@@ -1,0 +1,193 @@
+/* _tokens.css - Design System Custom Properties */
+
+:root {
+  /* ==========================================================================
+     1. Color Tokens (HSL Model)
+     ========================================================================== */
+  
+  /* Background / Dark Palette */
+  --bg-hue: 223;
+  --bg-saturation: 37%;
+  --bg-lightness: 7%;
+  
+  --background: hsl(var(--bg-hue), var(--bg-saturation), var(--bg-lightness)); /* #0b0f19 */
+  --background-alt: hsl(var(--bg-hue), var(--bg-saturation), 11%); /* #111726 */
+  
+  /* Frosted Glass Surfaces */
+  --surface: hsla(220, 25%, 10%, 0.7); /* Deep glass fill */
+  --surface-hover: hsla(220, 25%, 14%, 0.85);
+  --surface-card: hsla(220, 25%, 12%, 0.75);
+  --surface-border: hsla(0, 0%, 100%, 0.08); /* White 8% outline */
+  --surface-border-active: hsla(0, 0%, 100%, 0.2);
+  
+  /* Primary Brand (SOS Emergency) */
+  --primary-hue: 355;
+  --primary: hsl(var(--primary-hue), 78%, 56%); /* #e63946 Crimson */
+  --primary-hover: hsl(var(--primary-hue), 85%, 48%);
+  --primary-glow: hsla(var(--primary-hue), 78%, 56%, 0.35);
+  --primary-pulse: rgba(230, 57, 70, 0.4);
+  
+  /* Secondary Brand (Telemetry Charcoal) */
+  --secondary: hsl(215, 25%, 27%); /* #343f56 */
+  --secondary-hover: hsl(215, 23%, 34%);
+  --secondary-glow: hsla(215, 25%, 27%, 0.3);
+  
+  /* Accent Alert / Caution System */
+  --accent: hsl(42, 100%, 50%); /* Amber Yellow #ffb703 */
+  --accent-hover: hsl(38, 100%, 45%);
+  --accent-glow: hsla(42, 100%, 50%, 0.3);
+  
+  --success: hsl(142, 70%, 45%); /* Emerald Green #22c55e */
+  --success-hover: hsl(142, 72%, 38%);
+  --success-glow: hsla(142, 70%, 45%, 0.3);
+  
+  --info: hsl(200, 80%, 50%); /* High-tech Cyan #0284c7 */
+  --info-hover: hsl(200, 85%, 43%);
+  --info-glow: hsla(200, 80%, 50%, 0.3);
+
+  /* Typography Colors */
+  --text: hsl(210, 20%, 98%); /* Off-white primary text */
+  --text-muted: hsl(218, 12%, 65%); /* Muted sidebar and descriptions */
+  --text-dark: hsl(223, 30%, 12%); /* For high-contrast dark text inside white labels */
+
+  /* ==========================================================================
+     2. Typography Scale (Fluid & Clean)
+     ========================================================================== */
+  
+  --font-headings: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  --text-xs: 0.75rem;     /* 12px */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-lg: 1.125rem;    /* 18px */
+  --text-xl: 1.25rem;     /* 20px */
+  --text-2xl: 1.5rem;     /* 24px */
+  --text-3xl: 1.875rem;   /* 30px */
+  --text-4xl: 2.25rem;    /* 36px */
+  --text-5xl: 3rem;       /* 48px */
+  
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* ==========================================================================
+     3. Spacing Grid (8px Incremental Scale)
+     ========================================================================== */
+  
+  --space-1: 0.25rem;     /* 4px */
+  --space-2: 0.5rem;      /* 8px */
+  --space-3: 0.75rem;     /* 12px */
+  --space-4: 1rem;        /* 16px */
+  --space-5: 1.25rem;     /* 20px */
+  --space-6: 1.5rem;      /* 24px */
+  --space-8: 2rem;        /* 32px */
+  --space-10: 2.5rem;     /* 40px */
+  --space-12: 3rem;       /* 48px */
+  --space-16: 4rem;       /* 64px */
+
+  /* ==========================================================================
+     4. Border Radii Tokens
+     ========================================================================== */
+  
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;      /* Standard card outer border */
+  --radius-lg: 20px;      /* Main dashboard section borders */
+  --radius-xl: 32px;
+  --radius-pill: 9999px;  /* Pill elements, rounded buttons */
+
+  /* ==========================================================================
+     5. Elevation & Glowing Shadows
+     ========================================================================== */
+  
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+  
+  /* High-Tech Glowing telemetry shadows */
+  --shadow-glow-red: 0 0 25px var(--primary-glow);
+  --shadow-glow-amber: 0 0 25px var(--accent-glow);
+  --shadow-glow-success: 0 0 25px var(--success-glow);
+  --shadow-glow-cyan: 0 0 25px var(--info-glow);
+  --shadow-glass: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+
+  /* ==========================================================================
+     6. Dynamic Transitions
+     ========================================================================== */
+  
+  --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ==========================================================================
+   7. CSS Animations
+   ========================================================================== */
+
+/* Concentric Pulse waves for the core Emergency SOS target */
+@keyframes pulse-emergency {
+  0% {
+    box-shadow: 0 0 0 0 rgba(230, 57, 70, 0.7), 
+                0 0 0 0 rgba(230, 57, 70, 0.4),
+                var(--shadow-glow-red);
+  }
+  40% {
+    box-shadow: 0 0 0 18px rgba(230, 57, 70, 0), 
+                0 0 0 0 rgba(230, 57, 70, 0.4),
+                var(--shadow-glow-red);
+  }
+  80% {
+    box-shadow: 0 0 0 18px rgba(230, 57, 70, 0), 
+                0 0 0 32px rgba(230, 57, 70, 0),
+                var(--shadow-glow-red);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(230, 57, 70, 0), 
+                0 0 0 0 rgba(230, 57, 70, 0),
+                var(--shadow-glow-red);
+  }
+}
+
+/* Dynamic floating motion for telemetry markers/vehicles */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Slow decorative radial gradients rotation in background */
+@keyframes glow-drift {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(3%, 5%) scale(1.05);
+  }
+}
+
+/* Linear scanning pulse for active radar map components */
+@keyframes radar-scan {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Success icon validation check mark animation */
+@keyframes checkmark-reveal {
+  0% {
+    stroke-dashoffset: 20;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}

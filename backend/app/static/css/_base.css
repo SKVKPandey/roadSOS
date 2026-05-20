@@ -1,0 +1,164 @@
+/* _base.css - Typography & Element Styling Defaults */
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--weight-normal);
+  background-color: var(--background);
+  color: var(--text);
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   1. Typography / Headlines
+   ========================================================================== */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-headings);
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: var(--text-4xl);
+  font-weight: var(--weight-bold);
+}
+
+h2 {
+  font-size: var(--text-2xl);
+}
+
+h3 {
+  font-size: var(--text-xl);
+}
+
+h4 {
+  font-size: var(--text-lg);
+}
+
+p {
+  color: var(--text-muted);
+  font-size: var(--text-base);
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   2. Hyperlinks
+   ========================================================================== */
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: var(--transition-fast);
+  font-weight: var(--weight-medium);
+}
+
+a:hover {
+  color: var(--primary-hover);
+  text-shadow: 0 0 10px rgba(230, 57, 70, 0.2);
+}
+
+/* ==========================================================================
+   3. Custom Slim Scrollbar (Obsidian Theme)
+   ========================================================================== */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--bg-hue), var(--bg-saturation), 16%);
+  border-radius: var(--radius-pill);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--bg-hue), var(--bg-saturation), 24%);
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--bg-hue), var(--bg-saturation), 16%) var(--background);
+}
+
+/* ==========================================================================
+   4. High-Contrast Selection Text
+   ========================================================================== */
+
+::-moz-selection {
+  background: var(--primary-pulse);
+  color: var(--text);
+}
+
+::selection {
+  background: var(--primary-pulse);
+  color: var(--text);
+}
+
+/* ==========================================================================
+   5. Accessible Focus Indicators
+   ========================================================================== */
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+
+/* ==========================================================================
+   6. Form Field Defaults (Vanilla glass inputs)
+   ========================================================================== */
+
+label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text);
+  margin-bottom: var(--space-2);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background-color: hsla(220, 25%, 6%, 0.5);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: var(--text-base);
+  transition: var(--transition-fast);
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  background-color: hsla(220, 25%, 8%, 0.8);
+  box-shadow: 0 0 12px rgba(230, 57, 70, 0.15), var(--shadow-glass);
+}
+
+/* Disabled Form Elements */
+input:disabled,
+select:disabled,
+textarea:disabled,
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

@@ -1,0 +1,7 @@
+<!-- _scripts.html - unified script imports -->
+<script src="{{ url_for('static', filename='js/core/state.js') }}"></script>
+<script src="{{ url_for('static', filename='js/core/api.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+<!-- Dynamic page-specific scripts block -->
+{% block scripts %}{% endblock %}
