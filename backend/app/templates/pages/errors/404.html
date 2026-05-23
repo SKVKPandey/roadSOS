@@ -1,34 +1,15 @@
 {% extends 'layouts/base.html' %}
 {% from 'components/button.html' import render_button %}
 
-{% block title %}roadSOS | Geolocation Lost (404 Error){% endblock %}
+{% block title %}roadSOS · Not found{% endblock %}
+{% block top_subtitle %}404 · page not found{% endblock %}
 
 {% block content %}
-<div class="container mt-12 flex justify-center items-center" style="min-height: 50vh;">
-  <div class="glass-card p-8 text-center max-w-md w-full relative z-10">
-    <div class="text-danger mb-4 flex items-center justify-center animate-pulse" style="font-size: 72px;">
-      <i class="fa-solid fa-triangle-exclamation"></i>
-    </div>
-    
-    <h1 class="text-4xl font-bold text-gradient mb-2">404</h1>
-    <h2 class="text-lg font-semibold text-gradient-red mb-4">Satellite Target Lost</h2>
-    
-    <p class="text-sm text-muted mb-6">
-      The coordinates you navigated to do not contain a valid dispatch route. The server's tracking network has lost contact with this request.
-    </p>
-
-    <div class="flex flex-col gap-3 glass p-4 mb-6 text-left text-xs" style="border-radius: var(--radius-sm);">
-      <div class="flex justify-between">
-        <span class="font-medium text-muted">Error Signature:</span>
-        <span class="font-semibold text-danger">ROUTE_NOT_FOUND</span>
-      </div>
-      <div class="flex justify-between">
-        <span class="font-medium text-muted">Recovery Protocol:</span>
-        <span class="font-semibold text-success">RESET_TO_HOME</span>
-      </div>
-    </div>
-
-    {{ render_button('Return to Safety Dashboard', 'primary', url_for('home.index'), icon='fa-house-signal', class='w-full') }}
+<section class="flex flex-col items-center justify-center text-center gap-4 mt-12">
+  <div class="card p-8 w-full">
+    <h1 class="text-4xl mb-2">404</h1>
+    <p class="text-sm text-muted mb-6">We couldn't find that page. Let's get you back to safety.</p>
+    {{ render_button('Back to SOS', 'primary', url_for('home.index'), class='btn-block') }}
   </div>
-</div>
+</section>
 {% endblock %}

@@ -1,341 +1,215 @@
 {% extends 'layouts/base.html' %}
-{% from 'components/button.html' import render_button, render_sos_button %}
 
-{% block title %}roadSOS Dashboard | Premium Roadside Assistance{% endblock %}
+{% block title %}roadSOS · Tap for help{% endblock %}
+{% block top_subtitle %}One tap. One rescue.{% endblock %}
 
 {% block content %}
-<div class="container mt-8 flex flex-col gap-12">
-  <!-- ==========================================================================
-       1. Hero Emergency Action Segment
-       ========================================================================== -->
-  <section class="grid grid-2 gap-8 items-center p-8 glass-card" style="border-radius: var(--radius-lg)">
-    <div class="flex flex-col gap-4">
-      <div class="flex items-center gap-2">
-        <span class="pulse-indicator glow-danger"></span>
-        <span class="text-xs uppercase tracking-widest text-danger font-bold">Priority Sat-Link Active</span>
-      </div>
-      <h1 class="text-gradient text-5xl">Stranded? Get Rescued Instantly.</h1>
-      <p class="text-lg">
-        One tap initiates high-priority dispatch with automatic GPS location logging. roadSOS sends elite local towing, tire, battery, and lockout experts directly to your location.
-      </p>
-      <div class="flex items-center gap-4 mt-2">
-        <div class="flex items-center gap-2 text-sm font-semibold">
-          <i class="fa-solid fa-satellite-dish text-info"></i>
-          <span>GPS Geolocation Logged</span>
-        </div>
-        <div class="flex items-center gap-2 text-sm font-semibold">
-          <i class="fa-solid fa-shield-halved text-success"></i>
-          <span>99.8% ETA Accuracy</span>
-        </div>
-      </div>
-    </div>
+<section class="sos-page flex flex-col items-center justify-center">
 
-    <!-- Right Column: Reusable SOS Pulse Core -->
-    <div class="flex flex-col items-center justify-center p-6 relative">
-      <!-- Glow Ring backdrop styling -->
-      <div class="sos-ring-glow"></div>
-      {{ render_sos_button('SOS', 'Initiate Rescue', 'hero-sos-trigger') }}
-      <span class="text-xs text-muted mt-4 text-center font-medium">
-        <i class="fa-solid fa-circle-info mr-1 text-warning"></i> Tap to simulate real-time rescuer dispatch
+  <!-- ==========================================================================
+       Giant SOS tap (with HOLD-to-confirm progress ring)
+       ========================================================================== -->
+  <div class="sos-stage" id="sos-stage">
+    <button type="button" class="btn-sos" id="sos-button"
+            aria-label="Press and hold to call 112">
+      <!-- SVG progress ring overlays the circle -->
+      <svg class="hold-ring" viewBox="0 0 260 260" aria-hidden="true">
+        <circle class="hold-ring__track"    cx="130" cy="130" r="120"></circle>
+        <circle class="hold-ring__progress" cx="130" cy="130" r="120" id="hold-ring-progress"></circle>
+      </svg>
+
+      <span class="sos-label">SOS</span>
+
+      <span class="hold-label" id="hold-label">
+        <span class="hold-label__word">HOLD</span>
+        <span class="hold-label__timer" id="hold-timer">0.0s / 3s</span>
       </span>
-    </div>
-  </section>
+    </button>
+  </div>
+
+  <p class="sos-caption">TAP &amp; HOLD TO CALL 112</p>
+  <p class="sos-helper">
+    Press and hold for 3 seconds. We dial emergency, send your GPS, and alert your contacts.
+    Release early to cancel.
+  </p>
 
   <!-- ==========================================================================
-       2. Quick Service Request Grid
+       Secondary action — pick a specific service
        ========================================================================== -->
-  <section class="flex flex-col gap-6">
-    <div class="flex flex-col">
-      <span class="text-xs uppercase tracking-widest text-gradient-red font-bold mb-1">Interactive Telemetry</span>
-      <h2 class="text-3xl text-gradient">Select Breakdown Service</h2>
-      <p class="text-sm">Tap any service below to request immediate vehicle recovery assistance.</p>
-    </div>
+  <a href="{{ url_for('home.services') }}" class="pick-service mt-8">
+    Pick a specific service →
+  </a>
 
-    <div class="grid grid-4 gap-6">
-      <!-- Towing Card -->
-      <div class="glass-card p-6 flex flex-col justify-between gap-4 interactive-service-card" onclick="simulateServiceTrigger('Towing & Recovery')">
-        <div class="flex justify-between items-start">
-          <div class="service-icon-box text-danger bg-red-dim flex items-center justify-center">
-            <i class="fa-solid fa-truck-pickup"></i>
-          </div>
-          <span class="text-xs font-semibold text-danger">High Priority</span>
-        </div>
-        <div class="flex flex-col gap-1">
-          <h3 class="text-lg font-semibold text-gradient">Towing & Recovery</h3>
-          <p class="text-xs">Flatbeds, heavy recovery vehicles, and multi-car haulers.</p>
-        </div>
-        <div class="flex justify-between items-center mt-2 border-t pt-3" style="border-color: var(--surface-border)">
-          <span class="text-xs text-muted">Avg ETA: <strong>18 mins</strong></span>
-          <span class="text-xs text-info font-bold"><i class="fa-solid fa-circle-chevron-right"></i></span>
-        </div>
-      </div>
-
-      <!-- Battery Jumpstart Card -->
-      <div class="glass-card p-6 flex flex-col justify-between gap-4 interactive-service-card" onclick="simulateServiceTrigger('Battery Jumpstart')">
-        <div class="flex justify-between items-start">
-          <div class="service-icon-box text-warning bg-amber-dim flex items-center justify-center">
-            <i class="fa-solid fa-car-battery"></i>
-          </div>
-          <span class="text-xs font-semibold text-warning">Immediate</span>
-        </div>
-        <div class="flex flex-col gap-1">
-          <h3 class="text-lg font-semibold text-gradient">Dead Battery Jump</h3>
-          <p class="text-xs">Boost start, charging level checks, or replacement dispatch.</p>
-        </div>
-        <div class="flex justify-between items-center mt-2 border-t pt-3" style="border-color: var(--surface-border)">
-          <span class="text-xs text-muted">Avg ETA: <strong>12 mins</strong></span>
-          <span class="text-xs text-info font-bold"><i class="fa-solid fa-circle-chevron-right"></i></span>
-        </div>
-      </div>
-
-      <!-- Flat Tire Card -->
-      <div class="glass-card p-6 flex flex-col justify-between gap-4 interactive-service-card" onclick="simulateServiceTrigger('Flat Tire Swap')">
-        <div class="flex justify-between items-start">
-          <div class="service-icon-box text-success bg-green-dim flex items-center justify-center">
-            <i class="fa-solid fa-circle-notch"></i>
-          </div>
-          <span class="text-xs font-semibold text-success">Rapid Dispatch</span>
-        </div>
-        <div class="flex flex-col gap-1">
-          <h3 class="text-lg font-semibold text-gradient">Flat Tire Swap</h3>
-          <p class="text-xs">Spare installations, wheel alignment, or roadside punctures.</p>
-        </div>
-        <div class="flex justify-between items-center mt-2 border-t pt-3" style="border-color: var(--surface-border)">
-          <span class="text-xs text-muted">Avg ETA: <strong>14 mins</strong></span>
-          <span class="text-xs text-info font-bold"><i class="fa-solid fa-circle-chevron-right"></i></span>
-        </div>
-      </div>
-
-      <!-- Lockout Card -->
-      <div class="glass-card p-6 flex flex-col justify-between gap-4 interactive-service-card" onclick="simulateServiceTrigger('Vehicle Lockout')">
-        <div class="flex justify-between items-start">
-          <div class="service-icon-box text-info bg-cyan-dim flex items-center justify-center">
-            <i class="fa-solid fa-key"></i>
-          </div>
-          <span class="text-xs font-semibold text-info">Instant Entry</span>
-        </div>
-        <div class="flex flex-col gap-1">
-          <h3 class="text-lg font-semibold text-gradient">Vehicle Lockout</h3>
-          <p class="text-xs">Professional automotive lockpicks and entry technicians.</p>
-        </div>
-        <div class="flex justify-between items-center mt-2 border-t pt-3" style="border-color: var(--surface-border)">
-          <span class="text-xs text-muted">Avg ETA: <strong>11 mins</strong></span>
-          <span class="text-xs text-info font-bold"><i class="fa-solid fa-circle-chevron-right"></i></span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==========================================================================
-       3. Real-Time Telemetry Tracking Feed
-       ========================================================================== -->
-  <section class="grid grid-3 gap-8">
-    <!-- Telemetry Log Terminal (Left) -->
-    <div class="glass-card p-6 flex flex-col gap-4 col-span-2" style="grid-column: span 2;">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="pulse-indicator glow-cyan"></span>
-          <h3 class="text-lg font-semibold text-gradient">Live Satellite Rescue Feed</h3>
-        </div>
-        <span class="text-xs font-semibold text-muted tracking-wider uppercase">Active Dispatch Center</span>
-      </div>
-
-      <div class="telemetry-terminal font-body text-xs p-4 flex flex-col gap-3 overflow-y-auto" style="height: 220px; background-color: #07090e; border: 1px solid var(--surface-border); border-radius: var(--radius-sm); color: var(--text-muted)">
-        <div class="terminal-row flex gap-4">
-          <span class="text-info font-medium">[18:55:02]</span>
-          <span class="text-success">[CONN] Established secure satellite telemetry route...</span>
-        </div>
-        <div class="terminal-row flex gap-4">
-          <span class="text-info font-medium">[18:55:10]</span>
-          <span>[GPS] Coordinates synced: 28.5383° N, 77.2090° E (Local accuracy index: 98%)</span>
-        </div>
-        <div class="terminal-row flex gap-4">
-          <span class="text-info font-medium">[18:55:25]</span>
-          <span class="text-warning">[WARN] Rescuer dispatch queue monitoring active. Range: 15 miles...</span>
-        </div>
-        <div class="terminal-row flex gap-4" id="terminal-pulse-event">
-          <span class="text-info font-medium">[18:56:01]</span>
-          <span>[STAT] roadSOS network health check: OK. Satellite connection: Excellent.</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Active Rescue Map Panel (Right) -->
-    <div class="glass-card p-6 flex flex-col gap-4 justify-between">
-      <div class="flex items-center justify-between">
-        <h3 class="text-lg font-semibold text-gradient">Nearby Rescuers</h3>
-        <span class="badge badge-success text-xs font-bold p-1 px-2 text-success" style="border-radius: var(--radius-xs); border: 1px solid var(--success)">14 Available</span>
-      </div>
-      
-      <div class="flex flex-col gap-3">
-        <!-- Fleet Item 1 -->
-        <div class="flex items-center justify-between p-2 glass" style="border-radius: var(--radius-xs)">
-          <div class="flex items-center gap-3">
-            <span class="text-danger text-lg"><i class="fa-solid fa-truck-pickup"></i></span>
-            <div class="flex flex-col">
-              <span class="text-sm font-semibold text-gradient">Rescue Truck #04</span>
-              <span class="text-xs text-muted">Flatbed Recovery</span>
-            </div>
-          </div>
-          <span class="text-xs font-bold text-success">1.2 miles</span>
-        </div>
-
-        <!-- Fleet Item 2 -->
-        <div class="flex items-center justify-between p-2 glass" style="border-radius: var(--radius-xs)">
-          <div class="flex items-center gap-3">
-            <span class="text-warning text-lg"><i class="fa-solid fa-motorcycle"></i></span>
-            <div class="flex flex-col">
-              <span class="text-sm font-semibold text-gradient">Rescue Motor #12</span>
-              <span class="text-xs text-muted">Battery & Lockout Specialist</span>
-            </div>
-          </div>
-          <span class="text-xs font-bold text-success">2.4 miles</span>
-        </div>
-      </div>
-      
-      {{ render_button('View All Local Fleets', 'secondary', '#', size='sm', icon='fa-network-wired', class='w-full') }}
-    </div>
-  </section>
-</div>
+</section>
 
 <!-- ==========================================================================
-     Dashboard Simulator Modal / Trigger Overlay
+     Confirmation modal (after a completed hold)
      ========================================================================== -->
-<div class="modal-backdrop glass hidden" id="rescue-modal">
-  <div class="glass-card p-8 text-center max-w-md w-full relative z-10">
-    <div class="modal-indicator text-danger mb-4 flex items-center justify-center animate-bounce" style="font-size: 60px;">
-      <i class="fa-solid fa-satellite-dish"></i>
+<div class="modal-veil hidden" id="dispatch-modal" role="dialog" aria-modal="true">
+  <div class="modal-card animate-fade-up">
+    <div class="modal-icon">
+      <svg viewBox="0 0 24 24" width="36" height="36" fill="none"
+           stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+        <circle cx="12" cy="12" r="3"></circle>
+      </svg>
     </div>
-    <h2 class="text-2xl font-bold text-gradient mb-2" id="modal-service-title">Dispatching Emergency SOS</h2>
-    <p class="text-sm text-muted mb-6">
-      Satellite geolocation locked. Initiating real-time connection with closest local responder fleet. Please stand by your vehicle safely.
-    </p>
-    <div class="flex flex-col gap-4">
-      <div class="flex items-center justify-between text-xs p-3 glass" style="border-radius: var(--radius-sm)">
-        <span class="font-medium text-muted">GPS Signal Status</span>
-        <span class="text-success font-bold"><i class="fa-solid fa-circle-check"></i> LOCKED</span>
-      </div>
-      <div class="flex items-center justify-between text-xs p-3 glass" style="border-radius: var(--radius-sm)">
-        <span class="font-medium text-muted">Satellite Connection</span>
-        <span class="text-info font-bold"><i class="fa-solid fa-wifi"></i> ACTIVE</span>
-      </div>
-      <div class="flex items-center justify-between text-xs p-3 glass" style="border-radius: var(--radius-sm)">
-        <span class="font-medium text-muted">Estimated Arrival</span>
-        <span class="text-warning font-bold" id="modal-arrival-time"><i class="fa-solid fa-clock"></i> 14 Minutes</span>
-      </div>
+    <h2 class="modal-title">Dispatching emergency</h2>
+    <p class="modal-sub">Calling 112 · GPS sent · 3 contacts alerted</p>
+
+    <div class="modal-row">
+      <span>Caller</span>
+      <strong>{{ (current_user.username if current_user and current_user.is_authenticated else 'Arjun') }}</strong>
     </div>
-    
-    <button class="btn btn-primary w-full mt-6" onclick="closeRescueModal()">Acknowledge & Monitor Feed</button>
+    <div class="modal-row">
+      <span>Location</span>
+      <strong>13.0124° N, 80.2392° E</strong>
+    </div>
+    <div class="modal-row">
+      <span>ETA</span>
+      <strong class="text-success">~ 8 min</strong>
+    </div>
+
+    <button class="btn btn-outline btn-block mt-4" onclick="closeDispatchModal()">Cancel call</button>
   </div>
 </div>
 
 <style>
-  /* Hero segment SOS circle alignment wrapper */
-  .sos-ring-glow {
-    position: absolute;
-    width: 260px;
-    height: 260px;
-    border-radius: var(--radius-pill);
-    background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
-    z-index: 1;
-    pointer-events: none;
-    animation: float 6s infinite ease-in-out;
+  .sos-page {
+    flex: 1;
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-6);
   }
-  
-  /* Service card customized layout items */
-  .interactive-service-card {
-    cursor: pointer;
-    min-height: 210px;
+  .pick-service {
+    color: var(--text-strong);
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 4px;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
   }
-  .service-icon-box {
-    width: 48px;
-    height: 48px;
-    border-radius: var(--radius-sm);
-    font-size: var(--text-lg);
-  }
-  
-  /* Specific Dim Colors for boxes */
-  .bg-red-dim { background-color: rgba(230, 57, 70, 0.1); }
-  .bg-amber-dim { background-color: rgba(255, 183, 3, 0.1); }
-  .bg-green-dim { background-color: rgba(34, 197, 94, 0.1); }
-  .bg-cyan-dim { background-color: rgba(2, 132, 199, 0.1); }
-  
-  /* Telemetry log adjustments */
-  .telemetry-terminal {
-    font-family: monospace;
-    line-height: 1.8;
-  }
-  
-  /* Modal Overlay Backdrop */
-  .modal-backdrop {
+  .pick-service:hover { color: var(--primary-strong); }
+
+  /* ----- Modal ----- */
+  .modal-veil {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    z-index: 200;
+    inset: 0;
+    background: rgba(15, 14, 12, 0.45);
+    backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--space-4);
+    z-index: 100;
+    padding: var(--space-5);
   }
-  .modal-backdrop.hidden {
-    display: none !important;
+  .modal-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 380px;
+    padding: var(--space-6);
+    box-shadow: var(--shadow-lg);
   }
+  .modal-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-pill);
+    background: var(--primary);
+    color: var(--text-on-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-4);
+  }
+  .modal-title {
+    text-align: center;
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-1);
+  }
+  .modal-sub {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-5);
+  }
+  .modal-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--border);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+  .modal-row:last-of-type { border-bottom: 0; }
 </style>
 
 <script>
-  // Simple simulator actions
-  document.addEventListener('DOMContentLoaded', () => {
-    const sosBtn = document.getElementById('hero-sos-trigger');
-    if (sosBtn) {
-      sosBtn.addEventListener('click', () => {
-        triggerRescueSimulation('High-Priority SOS Beacon', '14 Minutes');
-      });
-    }
-  });
+  (function () {
+    const HOLD_MS = 3000;
+    const RING_R = 120;
+    const CIRC = 2 * Math.PI * RING_R; // ~754
+    const stage = document.getElementById('sos-stage');
+    const btn = document.getElementById('sos-button');
+    const ring = document.getElementById('hold-ring-progress');
+    const timerEl = document.getElementById('hold-timer');
 
-  function simulateServiceTrigger(serviceName) {
-    let eta = '15 Minutes';
-    if (serviceName.includes('Battery')) eta = '12 Minutes';
-    if (serviceName.includes('Tire')) eta = '14 Minutes';
-    if (serviceName.includes('Lockout')) eta = '11 Minutes';
-    
-    triggerRescueSimulation(serviceName, eta);
+    stage.style.setProperty('--ring-circumference', CIRC);
+    ring.style.strokeDasharray = CIRC;
+    ring.style.strokeDashoffset = CIRC;
+
+    let startedAt = null;
+    let rafId = null;
+    let completed = false;
+
+    function tick() {
+      if (startedAt == null) return;
+      const elapsed = Math.min(performance.now() - startedAt, HOLD_MS);
+      const pct = elapsed / HOLD_MS;
+      ring.style.strokeDashoffset = CIRC * (1 - pct);
+      timerEl.textContent = (elapsed / 1000).toFixed(1) + 's / 3s';
+      if (elapsed >= HOLD_MS) {
+        completed = true;
+        endHold(true);
+        return;
+      }
+      rafId = requestAnimationFrame(tick);
+    }
+
+    function beginHold(e) {
+      if (e.cancelable) e.preventDefault();
+      if (startedAt != null) return;
+      completed = false;
+      startedAt = performance.now();
+      btn.classList.add('is-holding');
+      rafId = requestAnimationFrame(tick);
+    }
+
+    function endHold(success) {
+      if (startedAt == null && !success) return;
+      cancelAnimationFrame(rafId);
+      startedAt = null;
+      btn.classList.remove('is-holding');
+      // animate ring back to empty
+      ring.style.transition = 'stroke-dashoffset 0.25s ease';
+      ring.style.strokeDashoffset = CIRC;
+      timerEl.textContent = '0.0s / 3s';
+      setTimeout(() => { ring.style.transition = ''; }, 260);
+      if (success) openDispatchModal();
+    }
+
+    btn.addEventListener('pointerdown', beginHold);
+    btn.addEventListener('pointerup', () => endHold(false));
+    btn.addEventListener('pointerleave', () => endHold(false));
+    btn.addEventListener('pointercancel', () => endHold(false));
+  })();
+
+  function openDispatchModal() {
+    document.getElementById('dispatch-modal').classList.remove('hidden');
   }
-
-  function triggerRescueSimulation(serviceName, eta) {
-    const modal = document.getElementById('rescue-modal');
-    const modalTitle = document.getElementById('modal-service-title');
-    const modalEta = document.getElementById('modal-arrival-time');
-    const terminal = document.querySelector('.telemetry-terminal');
-    
-    if (modal && modalTitle && modalEta) {
-      modalTitle.innerHTML = `Dispatching ${serviceName}`;
-      modalEta.innerHTML = `<i class="fa-solid fa-clock"></i> ${eta}`;
-      modal.classList.remove('hidden');
-    }
-    
-    // Append to Terminal Log
-    if (terminal) {
-      const now = new Date();
-      const timeStr = now.toTimeString().split(' ')[0];
-      
-      const newRow = document.createElement('div');
-      newRow.className = 'terminal-row flex gap-4';
-      newRow.innerHTML = `
-        <span class="text-info font-medium">[${timeStr}]</span>
-        <span class="text-danger font-semibold">[SOS] Emergency request triggered: ${serviceName} (Logged ETA: ${eta})</span>
-      `;
-      terminal.appendChild(newRow);
-      
-      // Auto scroll terminal to bottom
-      terminal.scrollTop = terminal.scrollHeight;
-    }
-  }
-
-  function closeRescueModal() {
-    const modal = document.getElementById('rescue-modal');
-    if (modal) {
-      modal.classList.add('hidden');
-    }
+  function closeDispatchModal() {
+    document.getElementById('dispatch-modal').classList.add('hidden');
   }
 </script>
 {% endblock %}

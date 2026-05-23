@@ -1,193 +1,148 @@
-/* _tokens.css - Design System Custom Properties */
+/* _tokens.css - roadSOS Design System (Light / Soft Pastel Theme) */
 
 :root {
   /* ==========================================================================
-     1. Color Tokens (HSL Model)
+     1. Color Tokens — Calm, paper-like surfaces with high-visibility CTAs
      ========================================================================== */
-  
-  /* Background / Dark Palette */
-  --bg-hue: 223;
-  --bg-saturation: 37%;
-  --bg-lightness: 7%;
-  
-  --background: hsl(var(--bg-hue), var(--bg-saturation), var(--bg-lightness)); /* #0b0f19 */
-  --background-alt: hsl(var(--bg-hue), var(--bg-saturation), 11%); /* #111726 */
-  
-  /* Frosted Glass Surfaces */
-  --surface: hsla(220, 25%, 10%, 0.7); /* Deep glass fill */
-  --surface-hover: hsla(220, 25%, 14%, 0.85);
-  --surface-card: hsla(220, 25%, 12%, 0.75);
-  --surface-border: hsla(0, 0%, 100%, 0.08); /* White 8% outline */
-  --surface-border-active: hsla(0, 0%, 100%, 0.2);
-  
-  /* Primary Brand (SOS Emergency) */
-  --primary-hue: 355;
-  --primary: hsl(var(--primary-hue), 78%, 56%); /* #e63946 Crimson */
-  --primary-hover: hsl(var(--primary-hue), 85%, 48%);
-  --primary-glow: hsla(var(--primary-hue), 78%, 56%, 0.35);
-  --primary-pulse: rgba(230, 57, 70, 0.4);
-  
-  /* Secondary Brand (Telemetry Charcoal) */
-  --secondary: hsl(215, 25%, 27%); /* #343f56 */
-  --secondary-hover: hsl(215, 23%, 34%);
-  --secondary-glow: hsla(215, 25%, 27%, 0.3);
-  
-  /* Accent Alert / Caution System */
-  --accent: hsl(42, 100%, 50%); /* Amber Yellow #ffb703 */
-  --accent-hover: hsl(38, 100%, 45%);
-  --accent-glow: hsla(42, 100%, 50%, 0.3);
-  
-  --success: hsl(142, 70%, 45%); /* Emerald Green #22c55e */
-  --success-hover: hsl(142, 72%, 38%);
-  --success-glow: hsla(142, 70%, 45%, 0.3);
-  
-  --info: hsl(200, 80%, 50%); /* High-tech Cyan #0284c7 */
-  --info-hover: hsl(200, 85%, 43%);
-  --info-glow: hsla(200, 80%, 50%, 0.3);
 
-  /* Typography Colors */
-  --text: hsl(210, 20%, 98%); /* Off-white primary text */
-  --text-muted: hsl(218, 12%, 65%); /* Muted sidebar and descriptions */
-  --text-dark: hsl(223, 30%, 12%); /* For high-contrast dark text inside white labels */
+  /* Base canvas: soft warm paper */
+  --background: #f6f3ee;            /* canvas (page background) */
+  --background-alt: #efeae2;        /* slightly deeper section bg */
+  --surface: #ffffff;               /* primary card surface */
+  --surface-muted: #faf7f2;         /* secondary card / inset surface */
+  --surface-sunken: #f1ede6;        /* sunken / disabled */
+
+  /* Borders & dividers */
+  --border: #e6dfd3;                /* default hairline */
+  --border-strong: #d6cdbe;         /* emphasised outline / focused field */
+  --border-dashed: #b9b0a1;         /* dashed advisory borders */
+
+  /* Brand: peach SOS */
+  --primary: #f4c89a;               /* peach fill (SOS giant tap, primary CTA) */
+  --primary-strong: #eaa66a;        /* hover / active */
+  --primary-ring: rgba(234, 166, 106, 0.35);
+  --primary-ink: #5a3a18;           /* readable text on peach */
+
+  /* Status colours */
+  --danger: #d04848;                /* trauma red */
+  --danger-soft: #f7dada;
+  --warning: #e7a637;               /* amber */
+  --warning-soft: #fbe7c2;
+  --success: #2f9d6a;               /* online emerald */
+  --success-soft: #d6efdf;
+  --info: #4a7fc1;                  /* police blue / informational */
+  --info-soft: #dfe8f6;
+
+  /* Service-tile pastel fills (match mockup grid) */
+  --tile-ambulance: #fbe1da;        /* peach-pink */
+  --tile-trauma: #f6d2d2;           /* dusty red */
+  --tile-police: #f4d9e2;           /* pink */
+  --tile-tow: #f3ece1;              /* warm grey */
+  --tile-fuel: #efe7d8;             /* sand */
+  --tile-all112: #f7d9b8;           /* deeper peach */
+
+  /* Typography */
+  --text: #1d1b18;                  /* near-black ink */
+  --text-strong: #0f0e0c;
+  --text-muted: #6b6258;            /* secondary / metadata */
+  --text-soft: #9a9286;             /* hints / placeholders */
+  --text-on-primary: #3a2208;       /* dark ink against peach */
 
   /* ==========================================================================
-     2. Typography Scale (Fluid & Clean)
+     2. Typography Scale
      ========================================================================== */
-  
+
   --font-headings: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
-  --text-xs: 0.75rem;     /* 12px */
-  --text-sm: 0.875rem;    /* 14px */
+  --text-xs:   0.75rem;   /* 12px */
+  --text-sm:   0.875rem;  /* 14px */
   --text-base: 1rem;      /* 16px */
-  --text-lg: 1.125rem;    /* 18px */
-  --text-xl: 1.25rem;     /* 20px */
-  --text-2xl: 1.5rem;     /* 24px */
-  --text-3xl: 1.875rem;   /* 30px */
-  --text-4xl: 2.25rem;    /* 36px */
-  --text-5xl: 3rem;       /* 48px */
-  
+  --text-lg:   1.125rem;  /* 18px */
+  --text-xl:   1.25rem;   /* 20px */
+  --text-2xl:  1.5rem;    /* 24px */
+  --text-3xl:  1.875rem;  /* 30px */
+  --text-4xl:  2.25rem;   /* 36px */
+  --text-5xl:  3rem;      /* 48px */
+  --text-6xl:  4rem;      /* 64px — giant SOS / HOLD label */
+
   --weight-normal: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
 
   /* ==========================================================================
-     3. Spacing Grid (8px Incremental Scale)
+     3. Spacing Grid (8px scale)
      ========================================================================== */
-  
-  --space-1: 0.25rem;     /* 4px */
-  --space-2: 0.5rem;      /* 8px */
-  --space-3: 0.75rem;     /* 12px */
-  --space-4: 1rem;        /* 16px */
-  --space-5: 1.25rem;     /* 20px */
-  --space-6: 1.5rem;      /* 24px */
-  --space-8: 2rem;        /* 32px */
-  --space-10: 2.5rem;     /* 40px */
-  --space-12: 3rem;       /* 48px */
-  --space-16: 4rem;       /* 64px */
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
 
   /* ==========================================================================
-     4. Border Radii Tokens
+     4. Radii
      ========================================================================== */
-  
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;      /* Standard card outer border */
-  --radius-lg: 20px;      /* Main dashboard section borders */
+
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 16px;     /* standard card */
+  --radius-lg: 22px;     /* outer page panels */
   --radius-xl: 32px;
-  --radius-pill: 9999px;  /* Pill elements, rounded buttons */
+  --radius-pill: 9999px;
 
   /* ==========================================================================
-     5. Elevation & Glowing Shadows
+     5. Elevation — quiet, no glow
      ========================================================================== */
-  
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
-  
-  /* High-Tech Glowing telemetry shadows */
-  --shadow-glow-red: 0 0 25px var(--primary-glow);
-  --shadow-glow-amber: 0 0 25px var(--accent-glow);
-  --shadow-glow-success: 0 0 25px var(--success-glow);
-  --shadow-glow-cyan: 0 0 25px var(--info-glow);
-  --shadow-glass: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+
+  --shadow-xs: 0 1px 2px rgba(31, 22, 8, 0.04);
+  --shadow-sm: 0 2px 6px rgba(31, 22, 8, 0.06);
+  --shadow-md: 0 6px 16px rgba(31, 22, 8, 0.07);
+  --shadow-lg: 0 14px 30px rgba(31, 22, 8, 0.10);
+  --shadow-sos: 0 12px 28px rgba(234, 166, 106, 0.45);
 
   /* ==========================================================================
-     6. Dynamic Transitions
+     6. Transitions
      ========================================================================== */
-  
+
   --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-normal: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-spring: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* ==========================================================================
+     7. Mobile shell sizing
+     ========================================================================== */
+
+  --shell-max-width: 440px;          /* phone-shaped column on desktop */
+  --bottom-nav-height: 72px;
 }
 
 /* ==========================================================================
-   7. CSS Animations
+   8. Keyframes
    ========================================================================== */
 
-/* Concentric Pulse waves for the core Emergency SOS target */
-@keyframes pulse-emergency {
-  0% {
-    box-shadow: 0 0 0 0 rgba(230, 57, 70, 0.7), 
-                0 0 0 0 rgba(230, 57, 70, 0.4),
-                var(--shadow-glow-red);
-  }
-  40% {
-    box-shadow: 0 0 0 18px rgba(230, 57, 70, 0), 
-                0 0 0 0 rgba(230, 57, 70, 0.4),
-                var(--shadow-glow-red);
-  }
-  80% {
-    box-shadow: 0 0 0 18px rgba(230, 57, 70, 0), 
-                0 0 0 32px rgba(230, 57, 70, 0),
-                var(--shadow-glow-red);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(230, 57, 70, 0), 
-                0 0 0 0 rgba(230, 57, 70, 0),
-                var(--shadow-glow-red);
-  }
+@keyframes pulse-soft {
+  0%, 100% { box-shadow: 0 0 0 0 var(--primary-ring), var(--shadow-sos); }
+  50%      { box-shadow: 0 0 0 14px rgba(234, 166, 106, 0), var(--shadow-sos); }
 }
 
-/* Dynamic floating motion for telemetry markers/vehicles */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
+@keyframes hold-ring {
+  from { stroke-dashoffset: var(--ring-circumference, 760); }
+  to   { stroke-dashoffset: 0; }
 }
 
-/* Slow decorative radial gradients rotation in background */
-@keyframes glow-drift {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(3%, 5%) scale(1.05);
-  }
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%      { transform: scale(1.4); opacity: 0.55; }
 }
 
-/* Linear scanning pulse for active radar map components */
-@keyframes radar-scan {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Success icon validation check mark animation */
-@keyframes checkmark-reveal {
-  0% {
-    stroke-dashoffset: 20;
-  }
-  100% {
-    stroke-dashoffset: 0;
-  }
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

@@ -3,223 +3,191 @@
 <head>
   {% include 'partials/_head.html' %}
 </head>
-<body class="relative">
-  <!-- Interactive Design Telemetry Backdrops -->
-  <div class="bg-drift-circle bg-drift-circle-primary"></div>
-  <div class="bg-drift-circle bg-drift-circle-cyan"></div>
+<body>
+  <div class="shell-frame">
+    <div class="shell">
 
-  <!-- ==========================================================================
-       1. Navigation Bar
-       ========================================================================== -->
-  <header class="glass z-10 p-4 sticky-nav">
-    <div class="container flex items-center justify-between">
-      <!-- Logo brand -->
-      <a href="/" class="flex items-center gap-3 font-headings font-bold text-xl text-gradient-red" id="logo-brand">
-        <i class="fa-solid fa-truck-monster fa-beat text-danger"></i>
-        <span>road<span style="color: var(--text)">SOS</span></span>
-      </a>
+      <!-- ==========================================================================
+           1. Top bar — greeting + presence pill
+           ========================================================================== -->
+      <header class="top-bar">
+        <div class="flex flex-col gap-1">
+          <span class="top-bar__hello">Hi {{ (current_user.username if current_user and current_user.is_authenticated else 'Arjun') }}</span>
+          <span class="top-bar__sub text-soft">{% block top_subtitle %}One tap. One rescue.{% endblock %}</span>
+        </div>
 
-      <!-- Desktop Navigation Links -->
-      <nav class="flex items-center gap-6" id="desktop-nav">
-        <a href="/" class="text-sm font-medium text-muted hover-nav active-nav">Dashboard</a>
-        <a href="#" class="text-sm font-medium text-muted hover-nav">Active Requests</a>
-        <a href="#" class="text-sm font-medium text-muted hover-nav">Rescuer Registry</a>
-        {% if current_user and current_user.is_authenticated %}
-          <div class="flex items-center gap-3">
-            <span class="text-sm text-muted">Welcome, <span class="text-gradient font-semibold">{{ current_user.username }}</span></span>
-            <a href="/auth/logout" class="btn btn-sm btn-secondary">Logout</a>
-          </div>
-        {% else %}
-          <div class="flex items-center gap-4">
-            <a href="/auth/login" class="text-sm font-medium text-muted hover-nav">Login</a>
-            <a href="/auth/signup" class="btn btn-sm btn-primary glow-red">Get Protected</a>
+        <div class="flex items-center gap-2">
+          <span class="pill pill-success pill-dot">online</span>
+          {% block top_action %}
+            <span class="pill">I'm helping</span>
+          {% endblock %}
+        </div>
+      </header>
+
+      <!-- ==========================================================================
+           2. Flash notifications
+           ========================================================================== -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-stack flex flex-col gap-2 mt-3">
+            {% for category, message in messages %}
+              <div class="flash flash-{{ category }}">
+                <span>{{ message }}</span>
+                <button class="flash__dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss">×</button>
+              </div>
+            {% endfor %}
           </div>
         {% endif %}
+      {% endwith %}
+
+      <!-- ==========================================================================
+           3. Page body
+           ========================================================================== -->
+      <main class="flex-1 flex flex-col">
+        {% block content %}{% endblock %}
+      </main>
+
+      <!-- ==========================================================================
+           4. Sticky bottom navigation (mobile-first)
+           ========================================================================== -->
+      <nav class="bottom-nav">
+        <a href="{{ url_for('home.index') }}" class="bottom-nav__item {% if active_tab == 'sos' or not active_tab %}is-active{% endif %}" aria-label="SOS">
+          <span class="bottom-nav__icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M8 12h8M12 8v8"></path>
+            </svg>
+          </span>
+          <span class="bottom-nav__label">SOS</span>
+        </a>
+        <a href="{{ url_for('home.services') }}" class="bottom-nav__item {% if active_tab == 'map' %}is-active{% endif %}" aria-label="Map">
+          <span class="bottom-nav__icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 4l-6 2v14l6-2 6 2 6-2V4l-6 2z"></path>
+              <path d="M9 4v14M15 6v14"></path>
+            </svg>
+          </span>
+          <span class="bottom-nav__label">Map</span>
+        </a>
+        <a href="#" class="bottom-nav__item {% if active_tab == 'profile' %}is-active{% endif %}" aria-label="Profile">
+          <span class="bottom-nav__icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="4"></circle>
+              <path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"></path>
+            </svg>
+          </span>
+          <span class="bottom-nav__label">Profile</span>
+        </a>
       </nav>
 
-      <!-- Mobile Nav Toggle button -->
-      <button class="hidden btn-mobile-toggle text-xl text-gradient" id="mobile-menu-btn" onclick="toggleMobileDrawer()">
-        <i class="fa-solid fa-bars-staggered"></i>
-      </button>
     </div>
-  </header>
-
-  <!-- Mobile Navigation Drawer -->
-  <div class="glass mobile-drawer flex flex-col gap-6" id="mobile-drawer">
-    <div class="flex items-center justify-between p-6 border-b" style="border-color: var(--surface-border)">
-      <span class="font-headings font-bold text-xl text-gradient-red">
-        <i class="fa-solid fa-truck-monster text-danger"></i> roadSOS
-      </span>
-      <button class="text-2xl text-gradient" onclick="toggleMobileDrawer()">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-    <nav class="flex flex-col gap-6 p-6 flex-1">
-      <a href="/" class="text-lg font-medium text-gradient" onclick="toggleMobileDrawer()">Dashboard</a>
-      <a href="#" class="text-lg font-medium text-muted" onclick="toggleMobileDrawer()">Active Requests</a>
-      <a href="#" class="text-lg font-medium text-muted" onclick="toggleMobileDrawer()">Rescuer Registry</a>
-      <hr style="border-color: var(--surface-border)">
-      {% if current_user and current_user.is_authenticated %}
-        <span class="text-sm text-muted">Logged in as <strong class="text-gradient">{{ current_user.username }}</strong></span>
-        <a href="/auth/logout" class="btn btn-secondary w-full">Logout</a>
-      {% else %}
-        <a href="/auth/login" class="text-lg font-medium text-muted" onclick="toggleMobileDrawer()">Login</a>
-        <a href="/auth/signup" class="btn btn-primary glow-red w-full mt-4" onclick="toggleMobileDrawer()">Get Protected</a>
-      {% endif %}
-    </nav>
   </div>
 
-  <!-- ==========================================================================
-       2. Flash Notification Alerts Layer
-       ========================================================================== -->
-  <div class="container mt-4 z-10" id="notifications-layer">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="glass p-4 mb-4 flex items-center justify-between alert-banner alert-{{ category }}" style="border-radius: var(--radius-sm)">
-            <div class="flex items-center gap-3">
-              {% if category == 'success' %}
-                <i class="fa-solid fa-circle-check text-success text-lg"></i>
-              {% elif category == 'error' or category == 'danger' %}
-                <i class="fa-solid fa-circle-exclamation text-danger text-lg"></i>
-              {% elif category == 'warning' %}
-                <i class="fa-solid fa-triangle-exclamation text-warning text-lg"></i>
-              {% else %}
-                <i class="fa-solid fa-circle-info text-info text-lg"></i>
-              {% endif %}
-              <span class="text-sm font-medium">{{ message }}</span>
-            </div>
-            <button class="text-muted hover:text-white" onclick="this.parentElement.remove()">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-  </div>
-
-  <!-- ==========================================================================
-       3. Page Body Blocks
-       ========================================================================== -->
-  <main class="flex-1 relative z-10 mb-12">
-    {% block content %}{% endblock %}
-  </main>
-
-  <!-- ==========================================================================
-       4. Premium Footer
-       ========================================================================== -->
-  <footer class="glass mt-12 p-8 border-t z-10" style="border-color: var(--surface-border)">
-    <div class="container grid grid-4 gap-8">
-      <div class="flex flex-col gap-3">
-        <span class="font-headings font-bold text-xl text-gradient-red">
-          <i class="fa-solid fa-truck-monster text-danger"></i> roadSOS
-        </span>
-        <p class="text-xs">Next-generation premium roadside rescue and breakdown logistics dashboard. Dispatched in real-time, tracked with precision.</p>
-        <span class="text-xs text-muted mt-2">© 2026 roadSOS Inc. All rights reserved.</span>
-      </div>
-
-      <div class="flex flex-col gap-3">
-        <h4 class="text-sm font-semibold uppercase tracking-wider text-gradient">Services</h4>
-        <div class="flex flex-col gap-2 text-xs">
-          <a href="#" class="text-muted hover:text-white"><i class="fa-solid fa-truck-pickup text-danger mr-2"></i>Towing & Recovery</a>
-          <a href="#" class="text-muted hover:text-white"><i class="fa-solid fa-car-battery text-warning mr-2"></i>Battery Jumpstart</a>
-          <a href="#" class="text-muted hover:text-white"><i class="fa-solid fa-circle-notch text-success mr-2"></i>Flat Tire Swap</a>
-          <a href="#" class="text-muted hover:text-white"><i class="fa-solid fa-key text-info mr-2"></i>Vehicle Lockout</a>
-        </div>
-      </div>
-
-      <div class="flex flex-col gap-3">
-        <h4 class="text-sm font-semibold uppercase tracking-wider text-gradient">Safety Network</h4>
-        <div class="flex flex-col gap-2 text-xs">
-          <a href="#" class="text-muted hover:text-white">Emergency Center</a>
-          <a href="#" class="text-muted hover:text-white">Become a Rescuer</a>
-          <a href="#" class="text-muted hover:text-white">Coverage API Status</a>
-          <a href="#" class="text-muted hover:text-white">Legal & Liability</a>
-        </div>
-      </div>
-
-      <div class="flex flex-col gap-3">
-        <h4 class="text-sm font-semibold uppercase tracking-wider text-gradient">Status & Connection</h4>
-        <div class="flex flex-col gap-2 text-xs">
-          <span class="flex items-center gap-2 font-medium text-success">
-            <span class="pulse-indicator glow-success"></span> Satellite Network Connected
-          </span>
-          <span class="text-muted">Rescue Dispatch Centers: <strong>1,420 Active</strong></span>
-          <span class="text-muted">Average Dispatch: <strong>14.5 Minutes</strong></span>
-        </div>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Extra Structural Styling adjustments for Navs -->
   <style>
-    .sticky-nav {
-      position: sticky;
-      top: 0;
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--surface-border);
+    /* ----- Top bar ----- */
+    .top-bar {
+      padding-top: var(--space-6);
+      padding-bottom: var(--space-4);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
     }
-    .hover-nav {
-      position: relative;
+    .top-bar__hello {
+      font-family: var(--font-headings);
+      font-size: var(--text-2xl);
+      font-weight: var(--weight-bold);
+      color: var(--text-strong);
+      line-height: 1.1;
+    }
+    .top-bar__sub {
+      font-size: var(--text-xs);
+      letter-spacing: 0.04em;
+    }
+
+    /* ----- Flash messages ----- */
+    .flash {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      font-size: var(--text-sm);
+      color: var(--text);
+    }
+    .flash-success { background: var(--success-soft); border-color: transparent; color: var(--success); }
+    .flash-warning { background: var(--warning-soft); border-color: transparent; color: #8a5a14; }
+    .flash-error,
+    .flash-danger  { background: var(--danger-soft); border-color: transparent; color: var(--danger); }
+    .flash__dismiss {
+      background: none;
+      border: 0;
+      color: inherit;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 var(--space-1);
+    }
+
+    /* ----- Bottom navigation ----- */
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: var(--bottom-nav-height);
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: stretch;
+      justify-content: space-around;
+      box-shadow: 0 -6px 16px rgba(31, 22, 8, 0.05);
+      z-index: 50;
+    }
+    @media (min-width: 768px) {
+      /* keep the bottom nav glued to the bottom of the phone-shaped shell on desktop */
+      .bottom-nav {
+        position: sticky;
+        left: auto;
+        right: auto;
+        margin-left: -var(--space-5);
+        margin-right: -var(--space-5);
+        border-radius: 0;
+      }
+    }
+    .bottom-nav__item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: var(--text-soft);
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: var(--weight-medium);
+      letter-spacing: 0.02em;
       transition: var(--transition-fast);
     }
-    .hover-nav::after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 2px;
-      bottom: -6px;
-      left: 0;
-      background: var(--primary);
-      transition: var(--transition-normal);
+    .bottom-nav__item:hover { color: var(--text); }
+    .bottom-nav__item.is-active { color: var(--text-strong); }
+    .bottom-nav__item.is-active .bottom-nav__icon {
+      background: var(--text-strong);
+      color: var(--surface);
     }
-    .hover-nav:hover::after,
-    .active-nav::after {
-      width: 100%;
+    .bottom-nav__icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 28px;
+      border-radius: 8px;
+      transition: var(--transition-fast);
     }
-    .hover-nav:hover,
-    .active-nav {
-      color: var(--text) !important;
-    }
-    
-    /* Mobile Navigation Drawer styles */
-    .mobile-drawer {
-      position: fixed;
-      top: 0;
-      right: -100%;
-      width: 320px;
-      height: 100%;
-      z-index: 100;
-      box-shadow: -10px 0 30px rgba(0,0,0,0.8);
-      transition: var(--transition-slow);
-    }
-    .mobile-drawer.open {
-      right: 0;
-    }
-    
-    /* Mobile view toggle override */
-    @media (max-width: 768px) {
-      #desktop-nav {
-        display: none !important;
-      }
-      .btn-mobile-toggle {
-        display: inline-flex !important;
-      }
-    }
-    
-    /* Pulse status dot */
-    .pulse-indicator {
-      width: 8px;
-      height: 8px;
-      border-radius: var(--radius-pill);
-      background-color: var(--success);
-      display: inline-block;
-      animation: pulse-success 2s infinite ease-in-out;
-    }
-    @keyframes pulse-success {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.4); opacity: 0.5; }
-    }
+    .bottom-nav__label { font-size: 11px; }
   </style>
 
   {% include 'partials/_scripts.html' %}

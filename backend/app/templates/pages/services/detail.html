@@ -1,0 +1,121 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}roadSOS · {{ svc.name }}{% endblock %}
+{% block top_subtitle %}Detail · {{ svc.short | lower }} centre{% endblock %}
+{% block top_action %}
+  <a href="{{ url_for('home.services') }}" class="pill">← back</a>
+{% endblock %}
+
+{% block content %}
+<section class="detail-page flex flex-col gap-4 mt-3">
+
+  <!-- Title + open badge -->
+  <div class="flex items-center justify-between gap-3">
+    <h1 class="text-2xl">{{ svc.name }}</h1>
+    {% if svc.open_now %}
+      <span class="pill pill-success pill-dot">OPEN</span>
+    {% else %}
+      <span class="pill pill-danger">CLOSED</span>
+    {% endif %}
+  </div>
+
+  <!-- Hero photo placeholder -->
+  <div class="detail-hero">
+    <span class="detail-hero__caption">[ photo · {{ svc.short | lower }} facade ]</span>
+  </div>
+
+  <!-- Capability pills -->
+  <div class="flex flex-wrap gap-2">
+    {% for tag in svc.tags %}
+      <span class="pill">{{ tag }}</span>
+    {% endfor %}
+  </div>
+
+  <!-- Distance card -->
+  <div class="card distance-card flex items-center justify-between">
+    <div class="flex flex-col gap-1">
+      <span class="uppercase text-xs text-soft font-medium">Distance</span>
+      <span class="text-xl font-semibold text-strong">
+        {% if svc.distance_km is not none %}
+          {{ svc.distance_km }} km · {{ svc.eta_min }} min drive
+        {% else %}
+          {{ svc.route_label }}
+        {% endif %}
+      </span>
+    </div>
+    {% if svc.distance_km is not none %}
+      <span class="text-sm text-muted">{{ svc.route_label }}</span>
+    {% endif %}
+  </div>
+
+  <!-- Action buttons -->
+  <div class="flex gap-3">
+    <button class="btn btn-outline btn-block btn-lg" onclick="alert('Opening route to {{ svc.name }}')">
+      Route there
+    </button>
+    <a href="tel:{{ svc.phone }}" class="btn btn-primary btn-block btn-lg">
+      Call ahead
+    </a>
+  </div>
+
+  <!-- Send medical card now (dashed advisory) -->
+  <div class="dashed-tile flex items-center justify-between">
+    <span class="text-sm text-strong font-medium">Send my medical card now</span>
+    <label class="toggle">
+      <input type="checkbox" id="send-card-now" checked>
+      <span class="toggle__track"><span class="toggle__thumb"></span></span>
+    </label>
+  </div>
+
+  <!-- Description (small, below) -->
+  <p class="text-sm text-muted mt-2">{{ svc.description }}</p>
+
+</section>
+
+<style>
+  .detail-page { padding-top: var(--space-3); }
+
+  .detail-hero {
+    height: 160px;
+    background:
+      repeating-linear-gradient(
+        135deg,
+        var(--tile-tow) 0 14px,
+        #f8f1e5 14px 28px
+      );
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    border: 1px solid var(--border);
+  }
+  .detail-hero__caption { letter-spacing: 0.04em; }
+
+  .distance-card {
+    padding: var(--space-4) var(--space-5);
+  }
+
+  /* ----- Toggle switch (reuse styling from grid page) ----- */
+  .toggle { position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer; flex-shrink: 0; }
+  .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .toggle__track {
+    position: absolute; inset: 0;
+    background: var(--text-soft);
+    border-radius: var(--radius-pill);
+    transition: var(--transition-fast);
+  }
+  .toggle__thumb {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 18px; height: 18px;
+    border-radius: var(--radius-pill);
+    background: #fff;
+    box-shadow: var(--shadow-xs);
+    transition: var(--transition-fast);
+  }
+  .toggle input:checked + .toggle__track { background: var(--text-strong); }
+  .toggle input:checked + .toggle__track .toggle__thumb { transform: translateX(20px); }
+</style>
+{% endblock %}

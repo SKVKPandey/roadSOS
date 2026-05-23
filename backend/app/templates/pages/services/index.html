@@ -1,0 +1,134 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}roadSOS · Pick a service{% endblock %}
+{% block top_subtitle %}Pick what you need.{% endblock %}
+{% block top_action %}
+  <a href="{{ url_for('home.index') }}" class="pill">← SOS</a>
+{% endblock %}
+
+{% block content %}
+<section class="grid-page flex flex-col gap-5">
+
+  <div class="flex flex-col gap-1 mt-2">
+    <h1 class="text-2xl">Pick what you need</h1>
+    <p class="text-sm text-muted">Each tile dials the closest one.</p>
+  </div>
+
+  <!-- Service grid (2 columns × 3 rows) -->
+  <div class="service-grid">
+    {% for s in services %}
+      <a href="{{ url_for('home.service_detail', slug=s.slug) }}"
+         class="service-tile {{ s.tile_color }}">
+        <div class="service-tile__head">
+          <span class="service-tile__glyph">{{ s.glyph }}</span>
+          <span class="service-tile__name">{{ s.short }}</span>
+        </div>
+        <div class="service-tile__meta">
+          {% if s.distance_km is not none %}
+            <span>{{ s.distance_km }} km</span>
+          {% else %}
+            <span>{{ s.route_label }}</span>
+          {% endif %}
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+
+  <!-- Auto-share medical card (dashed advisory tile) -->
+  <div class="dashed-tile flex items-center justify-between">
+    <div class="flex flex-col">
+      <span class="text-sm font-semibold text-strong">Auto-share medical card</span>
+      <span class="text-xs text-muted">Blood type, allergies &amp; ICE contacts sent on dispatch.</span>
+    </div>
+    <label class="toggle">
+      <input type="checkbox" id="auto-share-card" checked>
+      <span class="toggle__track"><span class="toggle__thumb"></span></span>
+    </label>
+  </div>
+
+</section>
+
+<style>
+  .grid-page { padding-top: var(--space-4); }
+
+  .service-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+  @media (max-width: 380px) {
+    .service-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  .service-tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 110px;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    color: var(--text-strong);
+    text-decoration: none;
+    transition: var(--transition-fast);
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .service-tile:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+  .service-tile__head { display: flex; flex-direction: column; gap: 4px; }
+  .service-tile__glyph {
+    font-family: var(--font-headings);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.55);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-strong);
+  }
+  .service-tile__name {
+    font-family: var(--font-headings);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+  }
+  .service-tile__meta {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    font-weight: var(--weight-medium);
+  }
+
+  /* Pastel tile fills (defined in tokens) */
+  .tile-ambulance { background: var(--tile-ambulance); }
+  .tile-trauma    { background: var(--tile-trauma); }
+  .tile-police    { background: var(--tile-police); }
+  .tile-tow       { background: var(--tile-tow); }
+  .tile-fuel      { background: var(--tile-fuel); }
+  .tile-all112    { background: var(--tile-all112); }
+
+  /* ----- Toggle switch ----- */
+  .toggle { position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer; flex-shrink: 0; }
+  .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .toggle__track {
+    position: absolute; inset: 0;
+    background: var(--text-soft);
+    border-radius: var(--radius-pill);
+    transition: var(--transition-fast);
+  }
+  .toggle__thumb {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 18px; height: 18px;
+    border-radius: var(--radius-pill);
+    background: #fff;
+    box-shadow: var(--shadow-xs);
+    transition: var(--transition-fast);
+  }
+  .toggle input:checked + .toggle__track { background: var(--text-strong); }
+  .toggle input:checked + .toggle__track .toggle__thumb { transform: translateX(20px); }
+</style>
+{% endblock %}

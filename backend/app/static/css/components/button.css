@@ -1,7 +1,7 @@
-/* button.css - Premium Button Components & SOS Pulse Core */
+/* button.css - roadSOS buttons + giant SOS tap + HOLD-to-confirm ring */
 
 /* ==========================================================================
-   1. Base Button Configuration
+   1. Base button
    ========================================================================== */
 
 .btn {
@@ -12,173 +12,205 @@
   padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-pill);
   font-family: var(--font-body);
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   font-weight: var(--weight-semibold);
+  line-height: 1;
   text-align: center;
   white-space: nowrap;
-  vertical-align: middle;
   user-select: none;
-  border: 1px solid transparent;
-  transition: var(--transition-spring);
-  position: relative;
-  overflow: hidden;
+  border: 1.5px solid transparent;
+  transition: var(--transition-fast);
+  cursor: pointer;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn-lg { padding: var(--space-4) var(--space-8); font-size: var(--text-lg); }
+.btn-sm { padding: var(--space-2) var(--space-4); font-size: var(--text-sm); }
+
+.btn-block { width: 100%; }
+
+/* Primary CTA — peach */
+.btn-primary {
+  background: var(--primary);
+  color: var(--text-on-primary);
+  border-color: var(--primary);
+  box-shadow: var(--shadow-xs);
+}
+.btn-primary:hover {
+  background: var(--primary-strong);
+  border-color: var(--primary-strong);
   box-shadow: var(--shadow-sm);
 }
 
-.btn:active {
-  transform: scale(0.96);
-}
-
-/* ==========================================================================
-   2. Design Variations
-   ========================================================================== */
-
-/* Primary Emergency Action (Crimson Red) */
-.btn-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, hsl(var(--primary-hue), 85%, 48%) 100%);
-  color: var(--text);
-  box-shadow: 0 4px 12px var(--primary-glow), var(--shadow-glass);
-}
-
-.btn-primary:hover {
-  background: linear-gradient(135deg, var(--primary-hover) 0%, hsl(var(--primary-hue), 90%, 42%) 100%);
-  color: var(--text);
-  box-shadow: 0 6px 20px rgba(230, 57, 70, 0.5), 
-              0 0 0 3px rgba(230, 57, 70, 0.2),
-              var(--shadow-glass);
-  transform: translateY(-2px);
-}
-
-/* Secondary Action (High-Tech Dark Slate) */
-.btn-secondary {
-  background-color: var(--secondary);
-  border-color: var(--surface-border);
-  color: var(--text);
-}
-
-.btn-secondary:hover {
-  background-color: var(--secondary-hover);
-  border-color: var(--surface-border-active);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), var(--shadow-glass);
-}
-
-/* Warning/Caution Status Button (Amber) */
-.btn-accent {
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
-  color: var(--text-dark);
-  font-weight: var(--weight-bold);
-  box-shadow: 0 4px 12px var(--accent-glow);
-}
-
-.btn-accent:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 183, 3, 0.4), 
-              0 0 0 3px rgba(255, 183, 3, 0.2);
-}
-
-/* Success Action (Emerald Green) */
-.btn-success {
-  background: linear-gradient(135deg, var(--success) 0%, var(--success-hover) 100%);
-  color: var(--text);
-}
-
-.btn-success:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
-}
-
-/* Outline Style Button */
+/* Outline — quiet secondary */
 .btn-outline {
-  background-color: transparent;
-  border: 1px solid var(--surface-border-active);
-  color: var(--text);
+  background: var(--surface);
+  color: var(--text-strong);
+  border-color: var(--text-strong);
+}
+.btn-outline:hover {
+  background: var(--text-strong);
+  color: var(--surface);
 }
 
-.btn-outline:hover {
-  background-color: hsla(0, 0%, 100%, 0.05);
-  border-color: var(--text);
-  transform: translateY(-2px);
+/* Ghost — minimal */
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: transparent;
 }
+.btn-ghost:hover { background: var(--surface-sunken); }
+
+/* Danger — for trauma / hard stops */
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+.btn-danger:hover { filter: brightness(1.06); }
 
 /* ==========================================================================
-   3. Reusable Call SOS Button (Urgent Pulsing Circle)
+   2. Giant SOS tap circle (default rest state)
    ========================================================================== */
 
-.btn-sos {
-  width: 180px;
-  height: 180px;
-  border-radius: var(--radius-pill);
-  background: radial-gradient(circle, var(--primary) 0%, hsl(var(--primary-hue), 85%, 46%) 100%);
-  color: var(--text);
-  font-family: var(--font-headings);
-  font-size: var(--text-3xl);
-  font-weight: var(--weight-bold);
-  letter-spacing: 0.05em;
-  border: 4px solid hsla(0, 0%, 100%, 0.15);
+.sos-stage {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  margin: 0 auto;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-1);
-  box-shadow: var(--shadow-glow-red);
-  cursor: pointer;
+  user-select: none;
+}
+
+.btn-sos {
   position: relative;
-  z-index: 10;
-  transition: var(--transition-spring);
-  animation: pulse-emergency 2.5s infinite ease-in-out;
+  z-index: 2;
+  width: 240px;
+  height: 240px;
+  border-radius: var(--radius-pill);
+  background: var(--primary);
+  color: var(--text-on-primary);
+  font-family: var(--font-headings);
+  font-size: 84px;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.04em;
+  border: 6px solid #fff;
+  box-shadow: var(--shadow-sos);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease;
+  animation: pulse-soft 2.6s infinite ease-in-out;
+  touch-action: manipulation;
 }
 
-.btn-sos:hover {
-  transform: scale(1.06);
-  border-color: hsla(0, 0%, 100%, 0.3);
-  background: radial-gradient(circle, var(--primary-hover) 0%, hsl(var(--primary-hue), 90%, 42%) 100%);
-  box-shadow: 0 0 40px rgba(230, 57, 70, 0.8);
+.btn-sos:hover { background: var(--primary-strong); }
+.btn-sos:active { transform: scale(0.97); }
+
+.btn-sos.is-holding {
+  animation: none;
+  background: var(--primary-strong);
+  transform: scale(1.02);
 }
 
-.btn-sos:active {
-  transform: scale(0.96);
-}
-
-/* Minor helper text inside SOS target */
-.btn-sos-subtext {
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  letter-spacing: 0.1em;
-  opacity: 0.85;
+.sos-caption {
+  margin-top: var(--space-5);
+  text-align: center;
+  font-family: var(--font-headings);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  color: var(--text-strong);
+}
+
+.sos-helper {
+  margin-top: var(--space-3);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
+
+/* Concentric ring backdrop (subtle peach halo) */
+.sos-stage::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: var(--radius-pill);
+  background: radial-gradient(circle, var(--primary-ring) 0%, transparent 65%);
+  z-index: 1;
+  pointer-events: none;
 }
 
 /* ==========================================================================
-   4. Loading & Disabled States
+   3. HOLD-to-confirm progress ring (SVG-driven)
    ========================================================================== */
 
-.btn-loading {
-  pointer-events: none;
-  color: transparent !important;
-}
-
-.btn-loading::after {
-  content: "";
+.hold-ring {
   position: absolute;
-  width: 18px;
-  height: 18px;
-  top: calc(50% - 9px);
-  left: calc(50% - 9px);
-  border: 2px solid var(--text);
-  border-radius: var(--radius-pill);
-  border-right-color: transparent;
-  animation: radar-scan 0.8s linear infinite;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+  transform: rotate(-90deg);
 }
 
-/* Responsive Scaling sizes */
-.btn-lg {
-  padding: var(--space-4) var(--space-8);
-  font-size: var(--text-base);
+.hold-ring__track {
+  fill: none;
+  stroke: rgba(255,255,255,0.55);
+  stroke-width: 8;
 }
 
-.btn-sm {
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--text-xs);
+.hold-ring__progress {
+  fill: none;
+  stroke: var(--text-strong);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: var(--ring-circumference, 760);
+  stroke-dashoffset: var(--ring-circumference, 760);
+  transition: stroke-dashoffset 0.05s linear;
 }
+
+.btn-sos.is-holding .hold-label {
+  display: flex;
+}
+
+.hold-label {
+  display: none;
+  position: absolute;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-family: var(--font-headings);
+  color: var(--text-on-primary);
+  pointer-events: none;
+  z-index: 4;
+}
+
+.hold-label__word {
+  font-size: 52px;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.06em;
+}
+
+.hold-label__timer {
+  margin-top: 6px;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.05em;
+  opacity: 0.85;
+}
+
+/* The default "SOS" label that hides during a hold */
+.btn-sos.is-holding .sos-label { opacity: 0; }
+.sos-label { transition: opacity 0.15s ease; }

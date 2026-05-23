@@ -1,4 +1,4 @@
-/* _base.css - Typography & Element Styling Defaults */
+/* _base.css - Typography & Element defaults (Light theme) */
 
 body {
   font-family: var(--font-body);
@@ -7,105 +7,67 @@ body {
   background-color: var(--background);
   color: var(--text);
   overflow-x: hidden;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 /* ==========================================================================
-   1. Typography / Headlines
+   1. Typography
    ========================================================================== */
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-headings);
   font-weight: var(--weight-semibold);
-  color: var(--text);
-  line-height: 1.25;
-  letter-spacing: -0.02em;
+  color: var(--text-strong);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
 }
 
-h1 {
-  font-size: var(--text-4xl);
-  font-weight: var(--weight-bold);
-}
-
-h2 {
-  font-size: var(--text-2xl);
-}
-
-h3 {
-  font-size: var(--text-xl);
-}
-
-h4 {
-  font-size: var(--text-lg);
-}
+h1 { font-size: var(--text-3xl); font-weight: var(--weight-bold); }
+h2 { font-size: var(--text-2xl); }
+h3 { font-size: var(--text-xl); }
+h4 { font-size: var(--text-lg); }
 
 p {
   color: var(--text-muted);
   font-size: var(--text-base);
-  line-height: 1.6;
+  line-height: 1.55;
 }
 
+small { color: var(--text-soft); }
+
 /* ==========================================================================
-   2. Hyperlinks
+   2. Links
    ========================================================================== */
 
 a {
-  color: var(--primary);
+  color: var(--text-strong);
   text-decoration: none;
-  transition: var(--transition-fast);
   font-weight: var(--weight-medium);
+  transition: var(--transition-fast);
 }
-
-a:hover {
-  color: var(--primary-hover);
-  text-shadow: 0 0 10px rgba(230, 57, 70, 0.2);
-}
+a:hover { color: var(--primary-strong); }
 
 /* ==========================================================================
-   3. Custom Slim Scrollbar (Obsidian Theme)
+   3. Scrollbar
    ========================================================================== */
 
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--background);
-}
-
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--bg-hue), var(--bg-saturation), 16%);
-  border-radius: var(--radius-pill);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--bg-hue), var(--bg-saturation), 24%);
-}
-
-/* For Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: hsl(var(--bg-hue), var(--bg-saturation), 16%) var(--background);
-}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: var(--radius-pill); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-soft); }
+* { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
 
 /* ==========================================================================
-   4. High-Contrast Selection Text
+   4. Selection
    ========================================================================== */
 
-::-moz-selection {
-  background: var(--primary-pulse);
-  color: var(--text);
-}
-
-::selection {
-  background: var(--primary-pulse);
-  color: var(--text);
-}
+::selection,
+::-moz-selection { background: var(--primary); color: var(--text-on-primary); }
 
 /* ==========================================================================
-   5. Accessible Focus Indicators
+   5. Focus visible
    ========================================================================== */
 
 input:focus-visible,
@@ -113,12 +75,13 @@ select:focus-visible,
 textarea:focus-visible,
 button:focus-visible,
 a:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 4px;
+  outline: 2px solid var(--primary-strong);
+  outline-offset: 3px;
+  border-radius: 6px;
 }
 
 /* ==========================================================================
-   6. Form Field Defaults (Vanilla glass inputs)
+   6. Forms (clean light fields)
    ========================================================================== */
 
 label {
@@ -132,33 +95,42 @@ label {
 input[type="text"],
 input[type="email"],
 input[type="password"],
+input[type="tel"],
 select,
 textarea {
   width: 100%;
   padding: var(--space-3) var(--space-4);
-  background-color: hsla(220, 25%, 6%, 0.5);
-  border: 1px solid var(--surface-border);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text);
   font-size: var(--text-base);
   transition: var(--transition-fast);
 }
 
+input::placeholder,
+textarea::placeholder { color: var(--text-soft); }
+
 input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="password"]:focus,
+input[type="tel"]:focus,
 select:focus,
 textarea:focus {
-  border-color: var(--primary);
-  background-color: hsla(220, 25%, 8%, 0.8);
-  box-shadow: 0 0 12px rgba(230, 57, 70, 0.15), var(--shadow-glass);
+  border-color: var(--primary-strong);
+  box-shadow: 0 0 0 4px var(--primary-ring);
 }
 
-/* Disabled Form Elements */
 input:disabled,
 select:disabled,
 textarea:disabled,
 button:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: var(--space-4) 0;
 }

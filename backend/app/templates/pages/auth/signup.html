@@ -1,70 +1,43 @@
 {% extends 'layouts/auth.html' %}
 {% from 'components/button.html' import render_button %}
 
-{% block title %}roadSOS Registry | Establish Vehicle Protection{% endblock %}
+{% block title %}roadSOS · Create account{% endblock %}
 
 {% block content %}
-<div class="flex flex-col gap-6">
-  <div class="flex flex-col text-center">
-    <h1 class="text-2xl font-bold text-gradient">Create Account</h1>
-    <p class="text-xs text-muted mt-1">Join the next-generation satellite-linked rescue network today.</p>
+<div class="flex flex-col gap-5">
+  <div class="flex flex-col gap-1">
+    <h1 class="text-2xl">Create your account</h1>
+    <p class="text-sm text-muted">Takes 20 seconds. We only ask what 112 actually needs.</p>
   </div>
 
   <form action="{{ url_for('auth.signup') }}" method="POST" class="flex flex-col gap-4">
-    <!-- CSRF Protection (Standard Flask WTF handler) -->
     <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}">
 
-    <div class="flex flex-col">
-      <label for="username">Username / Dispatch Name</label>
-      <div class="relative">
-        <span class="input-icon text-muted"><i class="fa-solid fa-user-shield"></i></span>
-        <input type="text" id="username" name="username" placeholder="e.g. Driver-99" required class="pl-10">
-      </div>
+    <div>
+      <label for="username">Name</label>
+      <input type="text" id="username" name="username" placeholder="Arjun K" required>
     </div>
 
-    <div class="flex flex-col">
-      <label for="email">Alert Notification Email</label>
-      <div class="relative">
-        <span class="input-icon text-muted"><i class="fa-solid fa-envelope"></i></span>
-        <input type="email" id="email" name="email" placeholder="e.g. safety@domain.com" required class="pl-10">
-      </div>
+    <div>
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="arjun@example.com" required>
     </div>
 
-    <div class="flex flex-col">
-      <label for="password">Create Access Key</label>
-      <div class="relative">
-        <span class="input-icon text-muted"><i class="fa-solid fa-key"></i></span>
-        <input type="password" id="password" name="password" placeholder="••••••••••••" required class="pl-10">
-      </div>
+    <div>
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="At least 8 characters" required>
     </div>
 
-    <label class="checkbox-container text-xs text-muted flex items-center gap-2 mt-1" style="margin-bottom: 0;">
-      <input type="checkbox" name="terms" required class="w-4 h-4">
-      <span>I agree to satellite location tracking terms</span>
+    <label class="flex items-center gap-2 text-sm text-muted" style="margin-bottom: 0;">
+      <input type="checkbox" name="terms" required style="width: 16px; height: 16px;">
+      I agree to share my location with dispatch during an SOS.
     </label>
 
-    {{ render_button('Register & Protect', 'primary', size='lg', icon='fa-user-plus', class='w-full mt-4') }}
+    {{ render_button('Create account', 'primary', size='lg', class='btn-block mt-2') }}
   </form>
 
-  <div class="text-xs text-center text-muted border-t pt-4" style="border-color: var(--surface-border)">
-    Already Registered? <a href="{{ url_for('auth.login') }}" class="font-bold text-gradient-red ml-1">Login Instead</a>
-  </div>
+  <p class="text-sm text-center text-muted">
+    Already have an account? <a href="{{ url_for('auth.login') }}" class="text-strong font-semibold">Log in</a>
+  </p>
 </div>
-
-<style>
-  /* Input prefix icons layout helper */
-  .pl-10 {
-    padding-left: 2.5rem !important;
-  }
-  .input-icon {
-    position: absolute;
-    left: var(--space-4);
-    top: calc(50% - 9px);
-    font-size: var(--text-sm);
-    pointer-events: none;
-  }
-  .checkbox-container input {
-    cursor: pointer;
-  }
-</style>
 {% endblock %}
