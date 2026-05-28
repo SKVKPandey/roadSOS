@@ -1,4 +1,6 @@
-from flask import Blueprint, render_template, abort
+from flask import Blueprint, render_template, abort, request, jsonify
+import urllib.request
+import json
 
 home_bp = Blueprint('home', __name__)
 
@@ -126,3 +128,25 @@ def service_detail(slug):
         active_tab='map',
         svc=svc,
     )
+
+
+@home_bp.route('/api/v1/geocode')
+def geocode():
+    """Backend proxy to fetch reverse geocoding from OpenStreetMap's Nominatim."""
+    lat = request.args.get('lat')
+    lng = request.args.get('lng')
+    if not lat or not lng:
+        return jsonify({'error': 'Missing lat or lng'}), 400
+
+    try:
+        url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lng}&zoom=16"
+        headers = {
+            'User-Agent': 'roadSOS-web-app/1.0 (contact: support@roadsos.com)',
+            'Accept-Language': 'en'
+        }
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=5) as response:
+            res_data = json.loads(response.read().decode('utf-8'))
+            return jsonify(res_data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

@@ -8,20 +8,26 @@
     <div class="shell">
 
       <!-- ==========================================================================
-           1. Top bar — greeting + presence pill
+           1. Top bar — location display + toggle sharing
            ========================================================================== -->
-      <header class="top-bar">
-        <div class="flex flex-col gap-1">
-          <span class="top-bar__hello">Hi {{ (current_user.username if current_user and current_user.is_authenticated else 'Arjun') }}</span>
-          <span class="top-bar__sub text-soft">{% block top_subtitle %}One tap. One rescue.{% endblock %}</span>
-        </div>
+      <header class="top-bar pt-4 w-full">
+        {% block top_action %}
+          <label class="unified-location-pill" id="location-toggle-label" role="button" tabindex="0" aria-label="Toggle location sharing">
+            <input type="checkbox" id="location-toggle-input" class="hidden-checkbox">
+            
+            <div class="unified-location-pill__info" id="address-pill">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="address-icon">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              <span id="address-text" class="address-text">Location OFF</span>
+            </div>
 
-        <div class="flex items-center gap-2">
-          <span class="pill pill-success pill-dot">online</span>
-          {% block top_action %}
-            <span class="pill">I'm helping</span>
-          {% endblock %}
-        </div>
+            <div class="unified-location-pill__switch">
+              <div class="unified-location-pill__thumb"></div>
+            </div>
+          </label>
+        {% endblock %}
       </header>
 
       <!-- ==========================================================================
