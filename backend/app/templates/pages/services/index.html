@@ -10,9 +10,28 @@
 <section class="grid-page flex flex-col gap-5">
 
   <div class="flex flex-col gap-1 mt-2">
-    <h1 class="text-2xl">Pick what you need</h1>
-    <p class="text-sm text-muted">Each tile dials the closest one.</p>
+    <h1 class="text-2xl">Verify nearby emergency service</h1>
+    <p class="text-sm text-muted">Pick a service, see who's closest, and call. Your <strong>country-aware</strong> all-services number is at the top right.</p>
   </div>
+
+  <a href="{{ url_for('home.map_view') }}" class="card map-cta flex items-center justify-between"
+     style="text-decoration:none;color:inherit;">
+    <div class="flex flex-col gap-1">
+      <span class="text-sm text-strong font-semibold">View live map</span>
+      <span class="text-xs text-muted">Google political view with H3 hex overlay + nearest hospitals.</span>
+    </div>
+    <span class="pill pill-success">Open</span>
+  </a>
+
+  <a href="{{ url_for('home.services_nearby') }}"
+     class="dashed-tile flex items-center justify-between"
+     style="text-decoration:none;color:inherit;">
+    <div class="flex flex-col">
+      <span class="text-sm font-semibold text-strong">Live trauma centres near you</span>
+      <span class="text-xs text-muted">Cache-backed list, ranked by GPS distance.</span>
+    </div>
+    <span class="text-strong">→</span>
+  </a>
 
   <!-- Service grid (2 columns × 3 rows) -->
   <div class="service-grid">
@@ -130,5 +149,6 @@
   }
   .toggle input:checked + .toggle__track { background: var(--text-strong); }
   .toggle input:checked + .toggle__track .toggle__thumb { transform: translateX(20px); }
+.map-cta { background: var(--surface); border: 1px solid var(--border); padding: var(--space-4); border-radius: var(--radius-sm); }
 </style>
 {% endblock %}

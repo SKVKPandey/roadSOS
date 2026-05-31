@@ -55,8 +55,8 @@
         <circle cx="12" cy="12" r="3"></circle>
       </svg>
     </div>
-    <h2 class="modal-title">Dispatching emergency</h2>
-    <p class="modal-sub">Calling 112 · GPS sent · 3 contacts alerted</p>
+    <h2 class="modal-title" id="modal-call-title">Dispatching emergency</h2>
+    <p class="modal-sub" id="modal-call-number">Calling 112 ...</p>
 
     <div class="modal-row">
       <span>Caller</span>
@@ -218,6 +218,24 @@
       }
     }
     document.getElementById('dispatch-modal').classList.remove('hidden');
+    // Update the modal subtitle so the user sees the region-aware number.
+    var sub = document.getElementById('modal-call-number');
+    var em = window.RoadSOSEmergency && window.RoadSOSEmergency.getCurrent && window.RoadSOSEmergency.getCurrent();
+    var dialPreview = (em && em.all) || '112';
+    var regionLabel = (em && em.name) ? em.name : 'unknown region';
+    if (sub) sub.textContent = 'Calling ' + dialPreview + ' (' + regionLabel + ')';
+    // Immediately fire the OS dialer to 112. Works in both PWA (browser
+    // intercepts tel:) and Capacitor APK (Android intent system dialer).
+    // No CALL_PHONE permission needed -- we open the dialer pre-filled,
+    // user taps green to actually place the call.
+    var dial = '112';
+    try {
+      if (window.RoadSOSEmergency && typeof window.RoadSOSEmergency.getDialableAll === 'function') {
+        dial = window.RoadSOSEmergency.getDialableAll() || '112';
+      }
+    } catch (e) { /* keep 112 */ }
+    try { window.location.href = 'tel:' + dial; }
+    catch (e) { console.error('tel: dispatch failed', e); }
   }
   function closeDispatchModal() {
     document.getElementById('dispatch-modal').classList.add('hidden');

@@ -1,0 +1,21 @@
+{
+  "name": "roadsos-mobile",
+  "version": "0.1.0",
+  "description": "Capacitor wrapper around the roadSOS Flask + PWA. Online mode: loads from a Flask server on the LAN.",
+  "private": true,
+  "scripts": {
+    "sync": "cap sync android",
+    "open": "cap open android",
+    "build:debug": "cd android && gradlew.bat assembleDebug",
+    "doctor": "cap doctor"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/app": "^6.0.1",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/geolocation": "^6.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  }
+}

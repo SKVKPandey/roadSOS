@@ -1,0 +1,310 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}roadSOS - Map{% endblock %}
+{% block top_subtitle %}Map{% endblock %}
+
+{% block head_extra %}
+<style>
+  .map-page { padding: 0 0 var(--space-6); }
+  .map-stage { position: relative; }
+  #gmap {
+    width: 100%;
+    height: calc(100vh - 220px);
+    min-height: 380px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    background: var(--surface-muted);
+  }
+  .map-legend {
+    position: absolute; bottom: 12px; left: 12px;
+    background: rgba(255,255,255,0.95);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    box-shadow: var(--shadow-xs);
+    z-index: 5;
+  }
+  .map-legend__row { display: flex; align-items: center; gap: 6px; }
+  .map-legend__sw {
+    display: inline-block; width: 14px; height: 14px;
+    border-radius: 3px; border: 1px solid rgba(0,0,0,0.15);
+  }
+  .map-status {
+    margin: var(--space-3) var(--space-2) 0;
+    font-size: var(--text-xs); color: var(--text-muted);
+    text-align: center; line-height: 1.5;
+  }
+  .map-banner {
+    background: var(--warning-soft); border: 1px solid #c89425;
+    color: #8a5a14; padding: 8px 12px; font-size: var(--text-xs);
+    border-radius: var(--radius-sm); margin-bottom: var(--space-3);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="map-page">
+  {% if not gmaps_api_key %}
+    <div class="map-banner">
+      Google Maps API key not configured. Set <code>GMAPS_EMBED_API_KEY</code> in your
+      <code>backend/.env</code> and restart Flask.
+    </div>
+  {% endif %}
+
+  <div class="map-stage">
+    <div id="gmap" style="width:100%;height:60vh;min-height:420px;background:#e6dfd3;"></div>
+    <div class="map-legend">
+      <div class="map-legend__row">
+        <span class="map-legend__sw" style="background:#4a7fc1;"></span> You
+      </div>
+      <div class="map-legend__row">
+        <span class="map-legend__sw" style="background:#d04848;"></span> Trauma centre
+      </div>
+      <div class="map-legend__row">
+        <span class="map-legend__sw" style="background:rgba(244,200,154,0.55);border-color:#eaa66a;"></span> Current H3 cell
+      </div>
+      <div class="map-legend__row">
+        <span class="map-legend__sw" style="background:rgba(74,127,193,0.18);border-color:#4a7fc1;"></span> Cached cell
+      </div>
+      <div class="map-legend__row">
+        <span class="map-legend__sw" style="background:transparent;border-color:#9a9286;border-style:dashed;"></span> Uncached cell
+      </div>
+    </div>
+  </div>
+  <p class="map-status" id="map-status">Loading map and waiting for GPS...</p>
+</section>
+
+<!-- h3-js for client-side hexagon polygons -->
+<script src="https://cdn.jsdelivr.net/npm/h3-js@4.1.0/dist/h3-js.umd.js"></script>
+
+<script>
+  // Globals so the Google callback can find them.
+  window.__roadsosMapInit = function () {
+    initMapNow();
+  };
+</script>
+
+{% if gmaps_api_key %}
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key={{ gmaps_api_key }}&callback=__roadsosMapInit&v=weekly"></script>
+{% endif %}
+
+<script>
+(function () {
+  var CACHE_RES = 7;
+  var NEARBY_K  = 2;
+
+  var statusEl = document.getElementById('map-status');
+  function setStatus(msg) { if (statusEl) statusEl.textContent = msg; }
+
+  var map = null;
+  var youMarker = null;
+  var accuracyCircle = null;
+  var hexPolys = [];
+  var centerMarkers = [];
+  var lastRenderedCell = null;
+  var knownCachedCells = new Set();
+  var infoWindow = null;
+
+  function initMapNow() {
+    if (!window.google || !google.maps) {
+      setStatus('Google Maps failed to load. Check API key + network.');
+      return;
+    }
+    if (!window.h3) {
+      setStatus('H3 library failed to load.');
+      return;
+    }
+    map = new google.maps.Map(document.getElementById('gmap'), {
+      center: { lat: 20.5937, lng: 78.9629 }, // India fallback
+      zoom: 5,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+      gestureHandling: 'greedy',
+      mapTypeId: 'roadmap',  // political/road view
+      styles: [
+        // Tone the map down a little so our overlays read clearly.
+        { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
+        { featureType: 'transit',     stylers: [{ visibility: 'off' }] }
+      ]
+    });
+    infoWindow = new google.maps.InfoWindow();
+    setStatus('Map ready. Waiting for GPS.');
+
+    // If a GPS fix is already in state, render immediately.
+    if (window.RoadSOSState) {
+      var cur = window.RoadSOSState.get('gpsCoordinates');
+      if (cur) refreshFor(cur.lat, cur.lng, cur.accuracy);
+      window.RoadSOSState.subscribe(function (k, v) {
+        if (k !== 'gpsCoordinates' || !v) return;
+        if (!lastRenderedCell) { refreshFor(v.lat, v.lng, v.accuracy); return; }
+        var newCell = h3.latLngToCell(v.lat, v.lng, CACHE_RES);
+        if (newCell !== lastRenderedCell) refreshFor(v.lat, v.lng, v.accuracy);
+        else moveYouOnly(v.lat, v.lng, v.accuracy);
+      });
+    }
+  }
+  // Expose so init order works if state arrives before maps loads.
+  window.initMapNow = initMapNow;
+
+  function clearHexagons() {
+    hexPolys.forEach(function (p) { p.setMap(null); });
+    hexPolys = [];
+  }
+  function clearCenterMarkers() {
+    centerMarkers.forEach(function (m) { m.setMap(null); });
+    centerMarkers = [];
+  }
+
+  function styleForCell(cell, centreCell) {
+    if (cell === centreCell) {
+      return { strokeColor: '#eaa66a', strokeWeight: 2,
+               fillColor: '#f4c89a', fillOpacity: 0.45 };
+    }
+    if (knownCachedCells.has(cell)) {
+      return { strokeColor: '#4a7fc1', strokeWeight: 1.2,
+               fillColor: '#4a7fc1', fillOpacity: 0.18 };
+    }
+    return { strokeColor: '#9a9286', strokeWeight: 1,
+             strokeOpacity: 0.7,
+             fillColor: '#ffffff', fillOpacity: 0,
+             // Dashed effect via icons trick is hairy; just use lower opacity
+             clickable: false };
+  }
+
+  function drawHexagons(centreLat, centreLng) {
+    clearHexagons();
+    var centreCell = h3.latLngToCell(centreLat, centreLng, CACHE_RES);
+    var cells = h3.gridDisk(centreCell, NEARBY_K);
+    cells.forEach(function (cell) {
+      var boundary = h3.cellToBoundary(cell);  // [[lat,lng], ...]
+      var path = boundary.map(function (p) { return { lat: p[0], lng: p[1] }; });
+      var style = styleForCell(cell, centreCell);
+      var poly = new google.maps.Polygon(Object.assign({
+        paths: path,
+        clickable: true
+      }, style));
+      poly.setMap(map);
+      // Tooltip via infoWindow on click (Google Maps has no first-class tooltip).
+      poly.addListener('click', function (e) {
+        infoWindow.setContent('<div style="font-family:Inter,sans-serif;font-size:12px;"><strong>H3 cell</strong><br>' +
+          cell + '<br>res ' + CACHE_RES + '</div>');
+        infoWindow.setPosition(e.latLng);
+        infoWindow.open(map);
+      });
+      hexPolys.push(poly);
+    });
+    return { centreCell: centreCell, cells: cells };
+  }
+
+  function moveYouOnly(lat, lng, accuracy) {
+    var pos = { lat: lat, lng: lng };
+    if (youMarker) youMarker.setPosition(pos);
+    if (accuracyCircle) {
+      accuracyCircle.setCenter(pos);
+      if (accuracy && accuracy < 5000) accuracyCircle.setRadius(accuracy);
+    }
+  }
+
+  function drawYou(lat, lng, accuracy) {
+    var pos = { lat: lat, lng: lng };
+    if (!youMarker) {
+      youMarker = new google.maps.Marker({
+        position: pos,
+        map: map,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 8, fillColor: '#4a7fc1', fillOpacity: 1,
+          strokeColor: '#fff', strokeWeight: 2
+        },
+        title: 'You are here',
+        zIndex: 999
+      });
+    } else youMarker.setPosition(pos);
+
+    if (!accuracyCircle && accuracy && accuracy < 5000) {
+      accuracyCircle = new google.maps.Circle({
+        map: map, center: pos, radius: accuracy,
+        strokeColor: '#4a7fc1', strokeOpacity: 0.6, strokeWeight: 1,
+        fillColor: '#4a7fc1', fillOpacity: 0.08,
+        clickable: false
+      });
+    } else if (accuracyCircle) {
+      accuracyCircle.setCenter(pos);
+      if (accuracy && accuracy < 5000) accuracyCircle.setRadius(accuracy);
+    }
+  }
+
+  function drawCentres(centres) {
+    clearCenterMarkers();
+    centres.forEach(function (c) {
+      var marker = new google.maps.Marker({
+        position: { lat: c.lat, lng: c.lng },
+        map: map,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 11, fillColor: '#d04848', fillOpacity: 1,
+          strokeColor: '#fff', strokeWeight: 2
+        },
+        label: { text: 'H', color: '#fff', fontSize: '11px', fontWeight: '700' },
+        title: c.name || 'Hospital'
+      });
+      marker.addListener('click', function () {
+        var phone = c.phone ? c.phone.replace(/[^\d+]/g, '')
+                            : (window.RoadSOSEmergency ? window.RoadSOSEmergency.getDialableFor('ambulance') : '112');
+        var distLabel = c.distance_m != null
+          ? (c.distance_m < 1000 ? Math.round(c.distance_m) + ' m'
+                                 : (c.distance_m / 1000).toFixed(1) + ' km')
+          : '';
+        infoWindow.setContent(
+          '<div style="font-family:Inter,sans-serif;font-size:13px;max-width:220px;">' +
+            '<strong>' + (c.name || 'Unnamed hospital') + '</strong>' +
+            (distLabel ? '<br><span style="color:#6b6258;">' + distLabel + '</span>' : '') +
+            '<br><a href="tel:' + phone + '" style="display:inline-block;margin-top:6px;padding:4px 10px;' +
+            'background:#f4c89a;color:#3a2208;border-radius:9999px;text-decoration:none;font-weight:700;font-size:12px;">Call</a>' +
+          '</div>'
+        );
+        infoWindow.open(map, marker);
+      });
+      centerMarkers.push(marker);
+    });
+  }
+
+  function refreshFor(lat, lng, accuracy) {
+    if (!map) return;
+    drawYou(lat, lng, accuracy);
+    var meta = drawHexagons(lat, lng);
+    var z = map.getZoom();
+    map.setCenter({ lat: lat, lng: lng });
+    if (!lastRenderedCell || z < 13) map.setZoom(14);
+    lastRenderedCell = meta.centreCell;
+    setStatus('Centre cell ' + meta.centreCell + ' (res ' + CACHE_RES +
+              ') · k-ring ' + NEARBY_K + ' · ' + meta.cells.length + ' cells.');
+
+    if (!window.RoadSOSTrauma) return;
+    window.RoadSOSTrauma.getNearby(lat, lng, { k: NEARBY_K, limit: 30 })
+      .then(function (resp) {
+        if (resp && resp.cells_searched) {
+          resp.cells_searched.forEach(function (c) { knownCachedCells.add(c); });
+          drawHexagons(lat, lng);
+        }
+        drawCentres(resp.centers || []);
+        setStatus('Centre cell ' + (resp.center_cell || meta.centreCell) +
+                  ' · ' + (resp.centers || []).length + ' centres' +
+                  (resp.offline ? ' (offline cached)' : '') + '.');
+      })
+      .catch(function (err) {
+        setStatus('Lookup failed: ' + err.message);
+      });
+  }
+
+  // If Google's async load fires before THIS script defines initMapNow,
+  // the callback is __roadsosMapInit. Set it up here as a fallback.
+  if (window.google && google.maps) initMapNow();
+})();
+</script>
+{% endblock %}

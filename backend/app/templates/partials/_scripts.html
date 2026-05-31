@@ -1,7 +1,46 @@
 <!-- _scripts.html - unified script imports -->
 <script src="{{ url_for('static', filename='js/core/state.js') }}"></script>
 <script src="{{ url_for('static', filename='js/core/api.js') }}"></script>
+<script src="{{ url_for('static', filename='js/core/idb.js') }}"></script>
+<script src="{{ url_for('static', filename='js/core/trauma-centers.js') }}"></script>
+<script src="{{ url_for('static', filename='js/core/medical-card.js') }}"></script>
+<script src="{{ url_for('static', filename='js/core/emergency-numbers.js') }}"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+<!-- Hook: every GPS fix kicks the forward-prefetcher.
+     trauma-centers throttles internally so this is cheap. -->
+<script>
+  if (window.RoadSOSState && window.RoadSOSState.subscribe) {
+    window.RoadSOSState.subscribe(function (key, value) {
+      if (key === 'gpsCoordinates' && value && window.RoadSOSTrauma) {
+        window.RoadSOSTrauma.prefetchForward(value);
+      }
+    });
+  }
+</script>
+
+<!-- PWA: register the service worker. Served from '/' so its scope covers the whole site. -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
+        .then(function (reg) {
+          console.log('[PWA] Service worker registered. Scope:', reg.scope);
+          if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
+          reg.addEventListener('updatefound', function () {
+            var nw = reg.installing;
+            if (!nw) return;
+            nw.addEventListener('statechange', function () {
+              if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('[PWA] New service worker installed; will activate on next load.');
+              }
+            });
+          });
+        })
+        .catch(function (err) { console.warn('[PWA] SW registration failed:', err); });
+    });
+  }
+</script>
 
 <!-- Dynamic page-specific scripts block -->
 {% block scripts %}{% endblock %}

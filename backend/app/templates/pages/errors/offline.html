@@ -1,0 +1,18 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}roadSOS - Offline{% endblock %}
+{% block top_subtitle %}You're offline{% endblock %}
+
+{% block content %}
+<section class="flex flex-col items-center justify-center text-center gap-4 mt-12">
+  <div class="card p-8 w-full">
+    <h1 class="text-3xl mb-2">No internet</h1>
+    <p class="text-sm text-muted mb-6">
+      You're offline. The SOS shortcut and your last seen services are still available below.
+      Once a network is back, the app will pick fresh data automatically.
+    </p>
+    <a href="/" class="btn btn-primary btn-block">Retry</a>
+    <a href="tel:112" class="btn btn-outline btn-block mt-3">Call 112 directly</a>
+  </div>
+</section>
+{% endblock %}

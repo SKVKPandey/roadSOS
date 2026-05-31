@@ -1,0 +1,21 @@
+{
+  "appId": "com.roadsos.app",
+  "appName": "roadSOS",
+  "webDir": "www",
+  "server": {
+    "url": "http://192.168.148.218:5000",
+    "cleartext": true,
+    "androidScheme": "http",
+    "allowNavigation": [
+      "192.168.148.218",
+      "nominatim.openstreetmap.org",
+      "overpass-api.de",
+      "overpass.kumi.systems",
+      "maps.mail.ru",
+      "overpass.private.coffee"
+    ]
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}

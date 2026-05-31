@@ -1,13 +1,18 @@
-from flask import Blueprint, render_template, abort, request, jsonify
+from flask import (
+    Blueprint, render_template, abort, request, jsonify,
+    send_from_directory, current_app, make_response,
+)
 import urllib.request
 import json
+import os
 
 home_bp = Blueprint('home', __name__)
 
 
 # ---------------------------------------------------------------------------
-# Hard-coded service registry (stand-in until backend data is wired).
-# Each entry powers both the service-grid tile AND the detail page.
+# Hard-coded service registry (stand-in until the cache-based trauma centre
+# pipeline replaces it for the hospital/trauma categories). Other services
+# (tow, fuel, police) still come from here.
 # ---------------------------------------------------------------------------
 SERVICES = {
     'ambulance': {
@@ -91,30 +96,51 @@ SERVICES = {
         'route_label': 'Unified dispatch',
         'open_now': True,
         'tags': ['Ambulance', 'Police', 'Fire', 'Disaster'],
-        'description': 'Unified emergency dispatcher — routes to whichever agency you need.',
+        'description': 'Unified emergency dispatcher - routes to whichever agency you need.',
         'phone': '112',
     },
 }
 
-# Ordered list for grid rendering (matches mockup left-to-right, top-to-bottom)
 SERVICE_ORDER = ['ambulance', 'trauma', 'police', 'tow', 'tyre-fuel', 'all-112']
 
 
 @home_bp.route('/')
 def index():
-    """Giant SOS tap — primary screen."""
+    """Giant SOS tap - primary screen."""
     return render_template('pages/home/index.html', active_tab='sos')
 
 
 @home_bp.route('/services')
 def services():
-    """Service grid — 2x3 pastel tiles for picking a specific responder."""
+    """Service grid - 2x3 pastel tiles for picking a specific responder."""
     tiles = [SERVICES[slug] for slug in SERVICE_ORDER]
     return render_template(
         'pages/services/index.html',
         active_tab='map',
         services=tiles,
     )
+
+
+@home_bp.route('/services/nearby')
+def services_nearby():
+    """Live list of nearest trauma centres, populated client-side from
+    /api/v1/regions/by-point once the GPS pill is on."""
+    return render_template(
+        'pages/services/nearby.html',
+        active_tab='map',
+    )
+
+
+@home_bp.route('/map')
+def map_view():
+    """Leaflet map with current location, H3 hex overlay, and trauma centres."""
+    return render_template('pages/map/index.html', active_tab='map')
+
+
+@home_bp.route('/profile')
+def profile():
+    """Medical card profile. Stored in localStorage, no DB."""
+    return render_template('pages/profile/medical_card.html', active_tab='profile')
 
 
 @home_bp.route('/services/<slug>')
@@ -130,9 +156,41 @@ def service_detail(slug):
     )
 
 
+# ---------------------------------------------------------------------------
+# PWA infrastructure routes
+# ---------------------------------------------------------------------------
+@home_bp.route('/service-worker.js')
+def service_worker():
+    """Served from the site root so the worker's scope covers everything."""
+    static_dir = os.path.join(current_app.root_path, 'static')
+    response = make_response(send_from_directory(static_dir, 'service-worker.js'))
+    response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Service-Worker-Allowed'] = '/'
+    return response
+
+
+@home_bp.route('/manifest.webmanifest')
+def web_manifest():
+    """Serve the PWA manifest at a stable root-level URL."""
+    static_dir = os.path.join(current_app.root_path, 'static')
+    response = make_response(send_from_directory(static_dir, 'manifest.webmanifest'))
+    response.headers['Content-Type'] = 'application/manifest+json'
+    return response
+
+
+@home_bp.route('/offline')
+def offline():
+    """Fallback page used by the service worker when navigation fails."""
+    return render_template('pages/errors/offline.html', active_tab='sos')
+
+
+# ---------------------------------------------------------------------------
+# Legacy geocode proxy (kept here for back-compat; new code under /api/v1).
+# ---------------------------------------------------------------------------
 @home_bp.route('/api/v1/geocode')
 def geocode():
-    """Backend proxy to fetch reverse geocoding from OpenStreetMap's Nominatim."""
+    """Backend proxy to fetch reverse geocoding from Nominatim."""
     lat = request.args.get('lat')
     lng = request.args.get('lng')
     if not lat or not lng:
@@ -142,7 +200,7 @@ def geocode():
         url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lng}&zoom=16"
         headers = {
             'User-Agent': 'roadSOS-web-app/1.0 (contact: support@roadsos.com)',
-            'Accept-Language': 'en'
+            'Accept-Language': 'en',
         }
         req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=5) as response:

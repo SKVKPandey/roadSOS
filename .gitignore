@@ -1,0 +1,38 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Python and virtual environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+
+# Databases and secrets
+*.db
+*.sqlite
+*.sqlite3
+.env
+.flaskenv
+
+# Log files
+*.log
+
+# Sub-directory specific local exclusions
+backend/.venv/
+backend/instance/*
+!backend/instance/.gitkeep

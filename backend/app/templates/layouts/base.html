@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   {% include 'partials/_head.html' %}
+  {% block head_extra %}{% endblock %}
 </head>
 <body>
   <div class="shell-frame">
@@ -75,7 +76,7 @@
           </span>
           <span class="bottom-nav__label">Map</span>
         </a>
-        <a href="#" class="bottom-nav__item {% if active_tab == 'profile' %}is-active{% endif %}" aria-label="Profile">
+        <a href="{{ url_for('home.profile') }}" class="bottom-nav__item {% if active_tab == 'profile' %}is-active{% endif %}" aria-label="Profile">
           <span class="bottom-nav__icon">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="8" r="4"></circle>

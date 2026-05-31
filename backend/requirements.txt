@@ -5,3 +5,10 @@ Flask-SQLAlchemy==3.1.1
 email-validator==2.1.1
 python-dotenv==1.0.1
 Werkzeug==3.0.1
+
+# Spatial indexing & emergency-grid lookup (cache-only MVP).
+# h3 is loosely pinned because 4.1.0 lacks Python 3.13 wheels on Windows --
+# any 4.x version exposes the same v4 API we depend on.
+h3>=4.2.0,<5.0
+cachetools>=5.5.0,<6.0
+requests>=2.32.0,<3.0

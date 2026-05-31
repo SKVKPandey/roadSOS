@@ -1,0 +1,228 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}roadSOS - Medical card{% endblock %}
+{% block top_subtitle %}Medical card{% endblock %}
+
+{% block content %}
+<section class="medcard-page">
+  <div class="medcard-header">
+    <h1 class="medcard-title">Medical Card</h1>
+    <p class="medcard-sub">Shown to responders when you trigger SOS. Stored only on this device.</p>
+  </div>
+
+  <!-- VIEW MODE ------------------------------------------------------------ -->
+  <article id="medcard-view" class="medcard">
+    <div class="medcard__band">
+      <span class="medcard__brand">roadSOS · MED</span>
+      <span class="medcard__blood" id="v-blood">--</span>
+    </div>
+    <div class="medcard__body">
+      <h2 class="medcard__name" id="v-name">No name yet</h2>
+      <p class="medcard__line"><span>Age</span><strong id="v-age">--</strong></p>
+      <p class="medcard__line"><span>Phone</span><strong id="v-phone">--</strong></p>
+      <p class="medcard__block-label">Allergies</p>
+      <p class="medcard__block" id="v-allergies">None reported.</p>
+      <p class="medcard__block-label">Conditions</p>
+      <p class="medcard__block" id="v-conditions">None reported.</p>
+      <p class="medcard__block-label">Current medications</p>
+      <p class="medcard__block" id="v-meds">None reported.</p>
+      <p class="medcard__footer">
+        <span>Updated</span>
+        <strong id="v-updated">never</strong>
+      </p>
+    </div>
+    <button class="btn btn-primary btn-block mt-4" id="medcard-edit-btn">Edit</button>
+  </article>
+
+  <!-- EDIT MODE ------------------------------------------------------------ -->
+  <form id="medcard-edit" class="medcard-form" hidden>
+    <label class="field">
+      <span>Full name</span>
+      <input type="text" id="f-name" placeholder="As on government ID" autocomplete="name">
+    </label>
+    <div class="field-row">
+      <label class="field">
+        <span>Date of birth</span>
+        <input type="date" id="f-dob" autocomplete="bday">
+      </label>
+      <label class="field">
+        <span>Blood group</span>
+        <select id="f-blood">
+          <option value="">--</option>
+          <option>O+</option><option>O-</option>
+          <option>A+</option><option>A-</option>
+          <option>B+</option><option>B-</option>
+          <option>AB+</option><option>AB-</option>
+        </select>
+      </label>
+    </div>
+    <label class="field">
+      <span>Phone</span>
+      <input type="tel" id="f-phone" placeholder="+91 9xxxx xxxxx" autocomplete="tel">
+    </label>
+    <label class="field">
+      <span>Allergies</span>
+      <textarea id="f-allergies" rows="2" placeholder="Penicillin, peanuts, ..."></textarea>
+    </label>
+    <label class="field">
+      <span>Existing conditions</span>
+      <textarea id="f-conditions" rows="2" placeholder="Diabetes T2, asthma, ..."></textarea>
+    </label>
+    <label class="field">
+      <span>Current medications</span>
+      <textarea id="f-meds" rows="2" placeholder="Metformin 500mg twice a day, ..."></textarea>
+    </label>
+    <div class="flex gap-3 mt-4">
+      <button type="button" class="btn btn-outline btn-block" id="medcard-cancel-btn">Cancel</button>
+      <button type="submit" class="btn btn-primary btn-block">Save</button>
+    </div>
+  </form>
+</section>
+
+<style>
+  .medcard-page { padding: var(--space-4) 0 var(--space-8); }
+  .medcard-header { margin-bottom: var(--space-4); }
+  .medcard-title {
+    font-family: var(--font-headings); font-weight: var(--weight-bold);
+    font-size: var(--text-2xl); color: var(--text-strong);
+  }
+  .medcard-sub { color: var(--text-muted); font-size: var(--text-sm); margin-top: 4px; }
+
+  /* ----- VIEW ----- */
+  .medcard {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  .medcard__band {
+    background: var(--primary);
+    color: var(--text-on-primary);
+    display: flex; justify-content: space-between; align-items: center;
+    padding: var(--space-3) var(--space-4);
+  }
+  .medcard__brand {
+    font-family: var(--font-headings); font-weight: var(--weight-bold);
+    letter-spacing: 0.08em; font-size: var(--text-xs);
+  }
+  .medcard__blood {
+    font-family: var(--font-headings); font-weight: var(--weight-bold);
+    font-size: var(--text-lg);
+    background: rgba(255,255,255,0.4); padding: 2px 10px; border-radius: var(--radius-pill);
+  }
+  .medcard__body { padding: var(--space-4); }
+  .medcard__name {
+    font-family: var(--font-headings); font-weight: var(--weight-bold);
+    font-size: var(--text-xl); color: var(--text-strong);
+    margin-bottom: var(--space-3);
+  }
+  .medcard__line {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 6px 0; border-bottom: 1px dashed var(--border);
+    font-size: var(--text-sm); color: var(--text-muted);
+  }
+  .medcard__line strong { color: var(--text-strong); font-weight: var(--weight-semibold); }
+  .medcard__block-label {
+    margin-top: var(--space-3);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    font-size: var(--text-xs); color: var(--text-soft);
+  }
+  .medcard__block {
+    background: var(--surface-muted);
+    padding: 8px 10px; border-radius: var(--radius-sm);
+    font-size: var(--text-sm); color: var(--text); margin-top: 2px;
+    white-space: pre-wrap;
+  }
+  .medcard__footer {
+    margin-top: var(--space-3); display: flex; justify-content: space-between;
+    font-size: var(--text-xs); color: var(--text-soft);
+  }
+
+  /* ----- FORM ----- */
+  .medcard-form { display: flex; flex-direction: column; gap: var(--space-3); }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field > span {
+    font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--text-soft);
+  }
+  .field input, .field select, .field textarea {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-family: inherit; font-size: var(--text-base);
+    background: var(--surface);
+    color: var(--text-strong);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none; border-color: var(--primary-strong);
+  }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+</style>
+
+<script src="{{ url_for('static', filename='js/core/medical-card.js') }}"></script>
+<script>
+  (function () {
+    var viewEl = document.getElementById('medcard-view');
+    var editEl = document.getElementById('medcard-edit');
+    var editBtn = document.getElementById('medcard-edit-btn');
+    var cancelBtn = document.getElementById('medcard-cancel-btn');
+
+    function ageFromDob(dob) {
+      if (!dob) return null;
+      var d = new Date(dob);
+      if (isNaN(d.getTime())) return null;
+      var ms = Date.now() - d.getTime();
+      var years = ms / (365.25 * 24 * 3600 * 1000);
+      return Math.floor(years);
+    }
+
+    function renderView() {
+      var card = window.RoadSOSMedCard.read();
+      document.getElementById('v-name').textContent = card.name || 'No name yet';
+      var age = ageFromDob(card.dob);
+      document.getElementById('v-age').textContent = age != null ? (age + ' yrs') : '--';
+      document.getElementById('v-blood').textContent = card.blood || '--';
+      document.getElementById('v-phone').textContent = card.phone || '--';
+      document.getElementById('v-allergies').textContent = card.allergies || 'None reported.';
+      document.getElementById('v-conditions').textContent = card.conditions || 'None reported.';
+      document.getElementById('v-meds').textContent = card.meds || 'None reported.';
+      document.getElementById('v-updated').textContent =
+        card.updated_at ? new Date(card.updated_at).toLocaleString() : 'never';
+    }
+
+    function showEdit() {
+      var card = window.RoadSOSMedCard.read();
+      document.getElementById('f-name').value = card.name || '';
+      document.getElementById('f-dob').value = card.dob || '';
+      document.getElementById('f-blood').value = card.blood || '';
+      document.getElementById('f-phone').value = card.phone || '';
+      document.getElementById('f-allergies').value = card.allergies || '';
+      document.getElementById('f-conditions').value = card.conditions || '';
+      document.getElementById('f-meds').value = card.meds || '';
+      viewEl.hidden = true; editEl.hidden = false;
+    }
+    function showView() { editEl.hidden = true; viewEl.hidden = false; renderView(); }
+
+    editBtn.addEventListener('click', showEdit);
+    cancelBtn.addEventListener('click', showView);
+    editEl.addEventListener('submit', function (e) {
+      e.preventDefault();
+      window.RoadSOSMedCard.write({
+        name: document.getElementById('f-name').value.trim(),
+        dob: document.getElementById('f-dob').value,
+        blood: document.getElementById('f-blood').value,
+        phone: document.getElementById('f-phone').value.trim(),
+        allergies: document.getElementById('f-allergies').value.trim(),
+        conditions: document.getElementById('f-conditions').value.trim(),
+        meds: document.getElementById('f-meds').value.trim(),
+        updated_at: Date.now()
+      });
+      showView();
+    });
+
+    renderView();
+  })();
+</script>
+{% endblock %}

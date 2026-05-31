@@ -1,0 +1,199 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}roadSOS - Nearby trauma centres{% endblock %}
+{% block top_subtitle %}Trauma centres near you{% endblock %}
+
+{% block content %}
+<section class="nearby-page">
+  <div class="nearby-header">
+    <h2 class="nearby-title">Nearest trauma centres</h2>
+    <p class="nearby-sub" id="nearby-sub">
+      Turn on the location pill above to start ranking facilities by distance.
+    </p>
+  </div>
+
+  <div id="nearby-loading" class="nearby-loading" hidden>
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Searching nearby cells&hellip;</p>
+  </div>
+
+  <div id="nearby-error" class="nearby-error" hidden>
+    <strong>Couldn't reach the trauma index.</strong>
+    <p id="nearby-error-detail" class="text-sm text-muted"></p>
+    <button type="button" class="btn btn-outline btn-sm" id="nearby-retry">Retry</button>
+  </div>
+
+  <ul id="nearby-list" class="nearby-list" aria-live="polite"></ul>
+
+  <p class="nearby-meta" id="nearby-meta"></p>
+</section>
+
+<style>
+  .nearby-page { padding: var(--space-4) 0 var(--space-8); }
+  .nearby-header { margin-bottom: var(--space-4); }
+  .nearby-title {
+    font-family: var(--font-headings);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-xl);
+    color: var(--text-strong);
+  }
+  .nearby-sub { color: var(--text-muted); font-size: var(--text-sm); margin-top: 4px; }
+
+  .nearby-loading { display: flex; align-items: center; gap: var(--space-3); color: var(--text-muted); padding: var(--space-3) 0; }
+  .nearby-loading .spinner {
+    width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--primary-strong);
+    border-radius: 50%; animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .nearby-error {
+    background: var(--danger-soft); border: 1px solid var(--danger); color: var(--danger);
+    padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm);
+    margin-bottom: var(--space-3);
+  }
+  .nearby-error p { color: inherit; margin: 4px 0 var(--space-2); }
+
+  .nearby-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+
+  .center-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-4);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .center-card.is-nearest { border-color: var(--primary-strong); box-shadow: var(--shadow-sm); }
+  .center-row {
+    display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3);
+  }
+  .center-name { font-family: var(--font-headings); font-weight: var(--weight-semibold); color: var(--text-strong); }
+  .center-distance { font-variant-numeric: tabular-nums; color: var(--text-muted); font-size: var(--text-sm); }
+  .center-meta { font-size: var(--text-xs); color: var(--text-muted); }
+  .center-actions { display: flex; gap: var(--space-2); margin-top: 6px; }
+  .center-actions a {
+    flex: 1; text-align: center;
+    background: var(--surface-muted); border: 1px solid var(--border);
+    border-radius: var(--radius-xs); padding: 8px 10px;
+    color: var(--text-strong); text-decoration: none;
+    font-size: var(--text-sm); font-weight: var(--weight-medium);
+  }
+  .center-actions a.primary {
+    background: var(--primary); border-color: var(--primary); color: var(--text-on-primary);
+  }
+  .nearby-meta {
+    margin-top: var(--space-4); font-size: var(--text-xs); color: var(--text-soft);
+    text-align: center; line-height: 1.5;
+  }
+</style>
+
+<script>
+  (function () {
+    var listEl    = document.getElementById('nearby-list');
+    var loadingEl = document.getElementById('nearby-loading');
+    var errorEl   = document.getElementById('nearby-error');
+    var errorDet  = document.getElementById('nearby-error-detail');
+    var subEl     = document.getElementById('nearby-sub');
+    var metaEl    = document.getElementById('nearby-meta');
+    var retryBtn  = document.getElementById('nearby-retry');
+
+    var lastCoords = null;
+    var inFlight   = false;
+
+    function show(el)   { el.hidden = false; }
+    function hide(el)   { el.hidden = true; }
+
+    function fmtDistance(m) {
+      if (m == null) return '';
+      if (m < 1000) return Math.round(m) + ' m';
+      return (m / 1000).toFixed(m < 10000 ? 1 : 0) + ' km';
+    }
+
+    function render(resp) {
+      hide(loadingEl); hide(errorEl);
+      var centers = resp.centers || [];
+      if (!centers.length) {
+        listEl.innerHTML = '<li class="center-card"><strong>Nothing found.</strong>' +
+          '<span class="center-meta">Try toggling the GPS pill off and on, or move to a different area.</span></li>';
+      } else {
+        listEl.innerHTML = centers.map(function (c, i) {
+          var tagsBits = [];
+          if (c.tags) {
+            if (c.tags.emergency === 'yes') tagsBits.push('24/7 emergency');
+            if (c.tags.healthcare === 'trauma_centre') tagsBits.push('Trauma centre');
+            if (c.tags.beds) tagsBits.push(c.tags.beds + ' beds');
+          }
+          var addr = c.address || '';
+          var phoneAction = c.phone
+            ? '<a class="primary" href="tel:' + c.phone.replace(/[^\d+]/g,'') + '">Call</a>'
+            : '<a class="primary" href="tel:112">Call 112</a>';
+          var mapAction = '<a href="https://www.openstreetmap.org/?mlat=' + c.lat + '&mlon=' + c.lng +
+                          '#map=18/' + c.lat + '/' + c.lng + '" target="_blank" rel="noopener">Map</a>';
+          return '<li class="center-card' + (i === 0 ? ' is-nearest' : '') + '">' +
+            '<div class="center-row">' +
+              '<span class="center-name">' + escapeHtml(c.name) + '</span>' +
+              '<span class="center-distance">' + fmtDistance(c.distance_m) + '</span>' +
+            '</div>' +
+            (addr ? '<span class="center-meta">' + escapeHtml(addr) + '</span>' : '') +
+            (tagsBits.length ? '<span class="center-meta">' + tagsBits.join(' &middot; ') + '</span>' : '') +
+            '<div class="center-actions">' + phoneAction + mapAction + '</div>' +
+          '</li>';
+        }).join('');
+      }
+
+      var when = new Date((resp.generated_at || 0) * 1000);
+      var ago = isFinite(when.getTime()) ? when.toLocaleTimeString() : 'just now';
+      metaEl.textContent = 'Showing ' + centers.length + ' centres in cell ' +
+        (resp.center_cell || '?') +
+        ' (resolution ' + (resp.resolution || '?') + ').' +
+        (resp.offline ? ' Offline cached copy.' : '') +
+        ' Updated ' + ago + '.';
+    }
+
+    function showError(msg) {
+      hide(loadingEl);
+      errorDet.textContent = msg || 'Unknown error';
+      show(errorEl);
+    }
+
+    function escapeHtml(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function fetchFor(coords) {
+      if (!coords || coords.lat == null || coords.lng == null) {
+        subEl.textContent = 'Turn on the location pill above to start ranking facilities by distance.';
+        return;
+      }
+      if (inFlight) return;
+      inFlight = true;
+      show(loadingEl); hide(errorEl);
+      subEl.textContent = 'Resolving cell for ' + coords.lat.toFixed(4) + ', ' + coords.lng.toFixed(4);
+
+      window.RoadSOSTrauma.getNearby(coords.lat, coords.lng, { k: 2, limit: 25 })
+        .then(function (resp) { render(resp); })
+        .catch(function (err) { showError(err.message); })
+        .then(function () { inFlight = false; });
+    }
+
+    retryBtn.addEventListener('click', function () { fetchFor(lastCoords); });
+
+    // Initial state: react to whatever the GPS pipeline already has,
+    // and re-fetch every time a new fix comes in.
+    if (window.RoadSOSState) {
+      var current = window.RoadSOSState.get('gpsCoordinates');
+      if (current) { lastCoords = current; fetchFor(current); }
+      window.RoadSOSState.subscribe(function (key, value) {
+        if (key === 'gpsCoordinates' && value) {
+          // Only re-fetch if we moved a meaningful distance OR have no data yet.
+          var moved = !lastCoords ||
+            Math.abs(value.lat - lastCoords.lat) > 0.002 ||
+            Math.abs(value.lng - lastCoords.lng) > 0.002;
+          lastCoords = value;
+          if (moved) fetchFor(value);
+        }
+      });
+    }
+  })();
+</script>
+{% endblock %}
